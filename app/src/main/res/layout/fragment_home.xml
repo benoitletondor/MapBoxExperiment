@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -10,4 +11,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-</LinearLayout>
+    <com.benoitletondor.mapboxexperiment.common.LocationAutoCompleteSearchBar
+        android:id="@+id/home_fragment_search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="18dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="15dp"
+        android:background="@android:color/white"
+        android:elevation="12dp"
+        android:hint="@string/search_location_hint"
+        android:padding="10dp"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:textColor="@android:color/black"
+        tools:ignore="Deprecated,UnusedAttribute"/>
+
+</FrameLayout>

@@ -4,14 +4,17 @@ import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.benoitletondor.mapboxexperiment.common.map.AutoCompleteLocationItem;
 import com.benoitletondor.mapboxexperiment.common.map.MapApi;
+import com.benoitletondor.mapboxexperiment.common.map.OnMapClickListener;
 import com.benoitletondor.mapboxexperiment.common.mvp.presenter.impl.BaseMapPresenterImpl;
 import com.benoitletondor.mapboxexperiment.scene.home.HomePresenter;
 import com.benoitletondor.mapboxexperiment.scene.home.HomeView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.location.LocationRequest;
+import com.mapbox.services.commons.models.Position;
 
-public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> implements HomePresenter
+public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> implements HomePresenter, OnMapClickListener
 {
     /**
      * The currently displayed map (will be null until loaded and nullified on each view stop to avoid leaks)
@@ -49,6 +52,7 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
         if( mMap != null )
         {
             mMap.clear();
+            mMap.setOnMapClickedListener(null);
             mMap = null;
         }
 
@@ -81,6 +85,7 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
     public void onMapAvailable(@NonNull MapApi map)
     {
         mMap = map;
+        mMap.setOnMapClickedListener(this);
     }
 
     @Override
@@ -109,6 +114,32 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
         {
             mMapZoomedOnUserPosition = true;
             mMap.moveCamera(location.getLatitude(), location.getLongitude(), 11f, System.currentTimeMillis() - mLastStartTimestamp > 1000);
+        }
+    }
+
+    @Override
+    public void onLocationSearchEntered(@NonNull AutoCompleteLocationItem item)
+    {
+        if( mMap != null )
+        {
+            mMap.addMarker(item.getLatitude(), item.getLongitude(), item.getLocationName(), null);
+            mMap.moveCamera(item.getLatitude(), item.getLongitude(), 14f, true);
+
+            if( mView != null )
+            {
+                mView.clearSearchBarContent();
+                mView.hideKeyboard();
+                mView.clearSearchBarFocus();
+            }
+        }
+    }
+
+    @Override
+    public void onClick(double latitude, double longitude)
+    {
+        if( mView != null )
+        {
+            mView.clearSearchBarFocus();
         }
     }
 }

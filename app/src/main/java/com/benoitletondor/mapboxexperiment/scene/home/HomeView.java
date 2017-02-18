@@ -27,4 +27,19 @@ public interface HomeView extends BaseMapView
      * @param message the error message
      */
     void showMapLoadingError(@Nullable String message);
+
+    /**
+     * Clear the focus on the search bar
+     */
+    void clearSearchBarFocus();
+
+    /**
+     * Remove the search bar content
+     */
+    void clearSearchBarContent();
+
+    /**
+     * Hide the keyboard if shown
+     */
+    void hideKeyboard();
 }

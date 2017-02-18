@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">MapBoxExperiment</string>
 
+    <string name="search_location_hint">Search location</string>
+
     <!-- Error dialogs -->
     <string name="no_location_error_title">Location unavailable</string>
     <string name="no_location_error_message">An error occurred trying to retrieve device location (%s)</string>

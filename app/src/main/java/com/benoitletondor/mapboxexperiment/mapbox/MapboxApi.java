@@ -5,10 +5,13 @@ import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.graphics.drawable.VectorDrawableCompat;
+import android.view.View;
 
 import com.benoitletondor.mapboxexperiment.R;
 import com.benoitletondor.mapboxexperiment.common.map.MapApi;
 import com.benoitletondor.mapboxexperiment.common.map.MapLocationSource;
+import com.benoitletondor.mapboxexperiment.common.map.MapMarker;
+import com.benoitletondor.mapboxexperiment.common.map.OnMapClickListener;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
@@ -80,6 +83,46 @@ final class MapboxApi implements MapApi, MapLocationSource.OnLocationChangedList
         }
     }
 
+    @NonNull
+    @Override
+    public MapMarker addMarker(double latitude, double longitude, @Nullable String title, @Nullable String snippet)
+    {
+        final MarkerViewOptions options = new MarkerViewOptions()
+            .position(new LatLng(latitude, longitude));
+
+        if( title != null )
+        {
+            options.title(title);
+        }
+
+        if( snippet != null )
+        {
+            options.snippet(snippet);
+        }
+
+        return new MapboxMarker(mMapboxMap.addMarker(options));
+    }
+
+    @Override
+    public void setOnMapClickedListener(@Nullable final OnMapClickListener listener)
+    {
+        if( listener == null )
+        {
+            mMapboxMap.setOnMapClickListener(null);
+        }
+        else
+        {
+            mMapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener()
+            {
+                @Override
+                public void onMapClick(@NonNull LatLng point)
+                {
+                    listener.onClick(point.getLatitude(), point.getLongitude());
+                }
+            });
+        }
+    }
+
     @Override
     public void onLocationChanged(@NonNull Location newLocation)
     {
@@ -87,15 +130,14 @@ final class MapboxApi implements MapApi, MapLocationSource.OnLocationChangedList
 
         if( mUserLocationMarker == null )
         {
-            mUserLocationMarker = mMapboxMap.addMarker(new MarkerViewOptions()
-                .position(position));
-
             final IconFactory iconFactory = IconFactory.getInstance(mAppContext);
             final VectorDrawableCompat drawableCompat = VectorDrawableCompat.create(mAppContext.getResources(), R.drawable.ic_user_position_map_marker, mAppContext.getTheme());
             assert drawableCompat != null;
             final Icon icon = iconFactory.fromDrawable(drawableCompat);
 
-            mUserLocationMarker.setIcon(icon);
+            mUserLocationMarker = mMapboxMap.addMarker(new MarkerViewOptions()
+                .position(position)
+                .icon(icon));
         }
         else
         {
