@@ -1,12 +1,14 @@
 package com.benoitletondor.mapboxexperiment.scene.main.impl;
 
-import android.support.annotation.NonNull;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.Toolbar;
 
 import com.benoitletondor.mapboxexperiment.R;
 import com.benoitletondor.mapboxexperiment.common.mvp.presenter.loader.PresenterFactory;
 import com.benoitletondor.mapboxexperiment.common.mvp.view.impl.BaseActivity;
 import com.benoitletondor.mapboxexperiment.injection.AppComponent;
+import com.benoitletondor.mapboxexperiment.scene.home.impl.HomeFragment;
 import com.benoitletondor.mapboxexperiment.scene.main.MainPresenter;
 import com.benoitletondor.mapboxexperiment.scene.main.MainView;
 import com.benoitletondor.mapboxexperiment.scene.main.injection.DaggerMainViewComponent;
@@ -25,6 +27,16 @@ public final class MainActivity extends BaseActivity<MainPresenter, MainView> im
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // FIXME change that when supporting more views
+        if( getSupportFragmentManager().findFragmentById(R.id.activity_main_fragment_container) == null )
+        {
+            getSupportFragmentManager().beginTransaction()
+                .replace(R.id.activity_main_fragment_container, new HomeFragment())
+                .commit();
+        }
     }
 
     @Override

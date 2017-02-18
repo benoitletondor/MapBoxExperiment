@@ -1,11 +1,20 @@
 package com.benoitletondor.mapboxexperiment.common.mvp.presenter.impl;
 
+import android.location.Location;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.benoitletondor.mapboxexperiment.common.map.MapApi;
-import com.benoitletondor.mapboxexperiment.common.mvp.interactor.BaseInteractor;
+import com.benoitletondor.mapboxexperiment.common.map.MapLocationSource;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationServices;
 import com.benoitletondor.mapboxexperiment.common.mvp.presenter.BaseMapPresenter;
 import com.benoitletondor.mapboxexperiment.common.mvp.view.BaseMapView;
+import com.benoitletondor.mapboxexperiment.common.mvp.interactor.BaseInteractor;
 
 /**
  * Implementation of the {@link BaseMapPresenter} that you should extends to provide a map view. If
@@ -13,8 +22,10 @@ import com.benoitletondor.mapboxexperiment.common.mvp.view.BaseMapView;
  *
  * @author Benoit LETONDOR
  */
-public abstract class BaseMapPresenterImpl<V extends BaseMapView> extends BasePresenterImpl<V> implements BaseMapPresenter<V>
+public abstract class BaseMapPresenterImpl<V extends BaseMapView> extends BasePresenterImpl<V> implements BaseMapPresenter<V>, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, MapLocationSource
 {
+    private final static String TAG = BaseMapPresenterImpl.class.getName();
+
     /**
      * Does this view needs geolocation of the user
      */
@@ -24,10 +35,20 @@ public abstract class BaseMapPresenterImpl<V extends BaseMapView> extends BasePr
      */
     private boolean mGeolocPermissionDenied = false;
     /**
+     * Play services client
+     */
+    @Nullable
+    private GoogleApiClient mGoogleApiClient;
+    /**
      * Current presenter state
      */
     @NonNull
     private State mState = State.CREATED;
+    /**
+     * Location listener gave by the map to send user location update
+     */
+    @Nullable
+    private MapLocationSource.OnLocationChangedListener mLocationChangeListener;
 
 // ------------------------------------------->
 
@@ -53,6 +74,16 @@ public abstract class BaseMapPresenterImpl<V extends BaseMapView> extends BasePr
         switch (mState)
         {
             case CREATED:
+                initPlayServices();
+                break;
+            case WAITING_FOR_GPS:
+                // Nothing to do since GPS are still loading
+                break;
+            case GPS_ERROR:
+                // Retry!
+                initPlayServices();
+                break;
+            case GPS_READY:
                 askForLocationIfNeededOrDisplayMap();
                 break;
             case WAITING_FOR_LOCATION_PERMISSION:
@@ -72,13 +103,108 @@ public abstract class BaseMapPresenterImpl<V extends BaseMapView> extends BasePr
         }
     }
 
+    @Override
+    public void onStop()
+    {
+        // Stop asking for user location when view moves in background
+        mLocationChangeListener = null;
+
+        try
+        {
+            if( mGoogleApiClient != null )
+            {
+                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            }
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG, "Error while removing location updates onStop", e);
+        }
+
+        super.onStop();
+    }
+
+    @Override
+    public void onPresenterDestroyed()
+    {
+        // Disconnect for GPS when the presenter gets destroyed
+        if (mGoogleApiClient != null)
+        {
+            mGoogleApiClient.disconnect();
+            mGoogleApiClient = null;
+        }
+
+        super.onPresenterDestroyed();
+    }
+
+    /**
+     * Called when the location service is not available
+     */
+    protected abstract void onLocationNotAvailable(@NonNull ConnectionResult connectionResult);
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle)
+    {
+        askForLocationIfNeededOrDisplayMap();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i)
+    {
+        // TODO handle this case properly
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
+    {
+        Log.w(TAG, "onConnectionFailed: "+connectionResult);
+        mState = State.GPS_ERROR;
+        mGoogleApiClient = null;
+
+        onLocationNotAvailable(connectionResult);
+
+        // Will fail and call onMapNotAvailable callback.
+        if( mView != null )
+        {
+            mView.loadMap();
+        }
+    }
+
+    /**
+     * Init play services if needed and start the map
+     */
+    private void initPlayServices()
+    {
+        assert mView != null;
+
+        if (mNeedGeoloc)
+        {
+            final GoogleApiClient.Builder builder = mView.getAPIBuilder();
+
+            mState = State.WAITING_FOR_GPS;
+
+            builder.addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this);
+
+            builder.addApi(LocationServices.API);
+
+            mGoogleApiClient = builder.build();
+            mGoogleApiClient.connect();
+        }
+        else
+        {
+            mState = State.GPS_READY;
+            askForLocationIfNeededOrDisplayMap();
+        }
+    }
+
     /**
      * Called when GPS are ready or when there are not needed (since no location needed). This
      * method takes care of requesting the permission if needed or loading the map.
      */
     private void askForLocationIfNeededOrDisplayMap()
     {
-        if (mNeedGeoloc)
+        if (mNeedGeoloc && mGoogleApiClient != null)
         {
             mState = State.WAITING_FOR_LOCATION_PERMISSION;
             if( mView != null )
@@ -134,6 +260,12 @@ public abstract class BaseMapPresenterImpl<V extends BaseMapView> extends BasePr
         populateMap(map);
     }
 
+    @Override
+    public void onErrorLoadingMap(@NonNull Exception error)
+    {
+        onMapNotAvailable(error);
+    }
+
     /**
      * Populate the map with the location source if needed and call the {@link #onMapAvailable(MapApi)}
      * callback.
@@ -144,12 +276,44 @@ public abstract class BaseMapPresenterImpl<V extends BaseMapView> extends BasePr
     {
         mState = State.MAP_AVAILABLE;
 
-        if (mNeedGeoloc && !mGeolocPermissionDenied)
+        if (mNeedGeoloc && !mGeolocPermissionDenied && mGoogleApiClient != null)
         {
-            map.setUserLocationEnabled();
+            map.setUserLocationEnabledWithSource(this);
         }
 
         onMapAvailable(map);
+    }
+
+    @Override
+    public void onLocationChanged(Location location)
+    {
+        if( mLocationChangeListener != null )
+        {
+            mLocationChangeListener.onLocationChanged(location);
+        }
+
+        onUserLocationChanged(location);
+    }
+
+    @Override
+    public void activate(@NonNull OnLocationChangedListener listener)
+    {
+        mLocationChangeListener = listener;
+
+        Log.d(TAG, "activate OnLocationChangedListener");
+
+        try
+        {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, getLocationRequest(), this);
+        }
+        catch (SecurityException e)
+        {
+            // Should never happen
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG, "Exception while activating location updates", e);
+        }
     }
 
     /**
@@ -161,6 +325,18 @@ public abstract class BaseMapPresenterImpl<V extends BaseMapView> extends BasePr
          * Presenter has just been created and not yet started
          */
         CREATED,
+        /**
+         * Presenter is waiting for Google Play Services to set-up
+         */
+        WAITING_FOR_GPS,
+        /**
+         * An error occurred while setting-up Google Play Services
+         */
+        GPS_ERROR,
+        /**
+         * Google Play Services are ready
+         */
+        GPS_READY,
         /**
          * Presenter is waiting for location permission response
          */

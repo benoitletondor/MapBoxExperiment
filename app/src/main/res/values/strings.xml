@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">MapBoxExperiment</string>
+
+    <!-- Error dialogs -->
+    <string name="no_location_error_title">Location unavailable</string>
+    <string name="no_location_error_message">An error occurred trying to retrieve device location (%s)</string>
+    <string name="location_permission_denied_title">Permission denied</string>
+    <string name="location_permission_denied_message">Location permission has been denied, device location won\'t be available on the map</string>
+    <string name="map_loading_error_title">Map unavailable</string>
+    <string name="map_loading_error_message">An error occurred while loading the map: %s</string>
 </resources>

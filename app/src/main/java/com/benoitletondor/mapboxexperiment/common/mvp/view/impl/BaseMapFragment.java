@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat;
 import com.benoitletondor.mapboxexperiment.common.map.MapApi;
 import com.benoitletondor.mapboxexperiment.common.map.MapLoadingCallback;
 import com.benoitletondor.mapboxexperiment.common.map.MapViewFragment;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.benoitletondor.mapboxexperiment.common.mvp.presenter.BaseMapPresenter;
 import com.benoitletondor.mapboxexperiment.common.mvp.view.BaseMapView;
 
@@ -25,7 +26,9 @@ public abstract class BaseMapFragment<P extends BaseMapPresenter<V>, V extends B
      * Default value for {@link #mTempLocationResult} == null
      */
     private static final int DEFAULT_TEMP_LOCATION_RESULT = -10;
-
+    /**
+     * Request code for location permission request
+     */
     private static final int REQUEST_CODE_LOCATION_PERMISSION = 1;
 
     /**
@@ -51,6 +54,13 @@ public abstract class BaseMapFragment<P extends BaseMapPresenter<V>, V extends B
     }
 
     @Override
+    @NonNull
+    public GoogleApiClient.Builder getAPIBuilder()
+    {
+        return new GoogleApiClient.Builder(getActivity().getApplicationContext());
+    }
+
+    @Override
     public void loadMap()
     {
         MapViewFragment mapFragment = (MapViewFragment) getChildFragmentManager().findFragmentById(mMapContainerId);
@@ -60,7 +70,7 @@ public abstract class BaseMapFragment<P extends BaseMapPresenter<V>, V extends B
 
             FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
             fragmentTransaction.replace(mMapContainerId, mapFragment);
-            fragmentTransaction.commitAllowingStateLoss();
+            fragmentTransaction.commitNow(); // Now is important, otherwise the following loadMapAPI would failed on first display cause map would'nt be loaded
         }
 
         mapFragment.loadMapAPI(new MapLoadingCallback()

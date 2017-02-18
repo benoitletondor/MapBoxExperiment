@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+apply from: 'mapbox.gradle'
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -12,6 +14,8 @@ android {
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         resConfigs "en"
+
+        buildConfigField "String", "MAPBOX_API_KEY", mapbox_api_key
     }
     buildTypes {
         release {
@@ -35,11 +39,13 @@ dependencies {
     // Support
     compile 'com.android.support:appcompat-v7:25.1.1'
 
-    // Play Services
+    // GPS (version is not the last on purpose to be able to test on simulators which don't have the last GPS version)
     compile 'com.google.android.gms:play-services-location:9.8.0'
 
     // Mapbox
-    compile 'com.mapbox.mapboxsdk:mapbox-android-sdk:4.2.2@aar'
+    compile ('com.mapbox.mapboxsdk:mapbox-android-sdk:4.2.2@aar'){
+        transitive=true
+    }
 
     // Rx
     compile 'io.reactivex.rxjava2:rxjava:2.0.6'

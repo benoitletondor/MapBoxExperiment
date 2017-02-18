@@ -6,9 +6,10 @@ import android.support.annotation.NonNull;
 import com.benoitletondor.mapboxexperiment.injection.AppComponent;
 import com.benoitletondor.mapboxexperiment.injection.AppModule;
 import com.benoitletondor.mapboxexperiment.injection.DaggerAppComponent;
+import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.squareup.leakcanary.LeakCanary;
 
-public class App extends Application
+public final class App extends Application
 {
     /**
      * The app dagger component
@@ -27,6 +28,8 @@ public class App extends Application
             .build();
 
         LeakCanary.install(this);
+
+        MapboxAccountManager.start(this, BuildConfig.MAPBOX_API_KEY);
     }
 
 // ---------------------------------->

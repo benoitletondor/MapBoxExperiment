@@ -1,9 +1,11 @@
 package com.benoitletondor.mapboxexperiment.common.mvp.presenter;
 
+import android.location.Location;
 import android.support.annotation.NonNull;
 
 import com.benoitletondor.mapboxexperiment.common.map.MapApi;
 import com.benoitletondor.mapboxexperiment.common.map.MapLoadingCallback;
+import com.google.android.gms.location.LocationRequest;
 import com.benoitletondor.mapboxexperiment.common.mvp.view.BaseMapView;
 
 /**
@@ -24,9 +26,24 @@ public interface BaseMapPresenter<V extends BaseMapView> extends BasePresenter<V
     /**
      * Called when the map is not available due to an error
      *
-     * @param error an exception containing the encountered error
+     * @param error an exception containing the encountered
      */
     void onMapNotAvailable(@NonNull Exception error);
+
+    /**
+     * You should provide your location request here
+     *
+     * @return the location request used by the map
+     */
+    @NonNull
+    LocationRequest getLocationRequest();
+
+    /**
+     * Called when the user location change
+     *
+     * @param location the new user location
+     */
+    void onUserLocationChanged(@NonNull Location location);
 
 // ---------------------------------------->
 
