@@ -12,7 +12,6 @@ import com.benoitletondor.mapboxexperiment.scene.home.HomePresenter;
 import com.benoitletondor.mapboxexperiment.scene.home.HomeView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.location.LocationRequest;
-import com.mapbox.services.commons.models.Position;
 
 public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> implements HomePresenter, OnMapClickListener
 {
@@ -132,6 +131,12 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
                 mView.clearSearchBarFocus();
             }
         }
+    }
+
+    @Override
+    public void onAddLocationFABClicked()
+    {
+        // TODO
     }
 
     @Override

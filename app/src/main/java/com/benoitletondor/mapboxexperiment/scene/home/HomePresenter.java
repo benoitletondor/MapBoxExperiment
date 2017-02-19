@@ -13,4 +13,9 @@ public interface HomePresenter extends BaseMapPresenter<HomeView>
      * @param item the search item
      */
     void onLocationSearchEntered(@NonNull AutoCompleteLocationItem item);
+
+    /**
+     * Called when the user press on the add location FAB
+     */
+    void onAddLocationFABClicked();
 }

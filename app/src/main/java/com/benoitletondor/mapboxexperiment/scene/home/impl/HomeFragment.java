@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +36,7 @@ public final class HomeFragment extends BaseMapFragment<HomePresenter, HomeView>
     PresenterFactory<HomePresenter> mPresenterFactory;
 
     private LocationAutoCompleteSearchBar<MapboxAutocompleteLocationItem> mSearchBar;
+    private FloatingActionButton mAddLocationFAB;
 
 // ---------------------------------->
 
@@ -56,7 +58,7 @@ public final class HomeFragment extends BaseMapFragment<HomePresenter, HomeView>
     {
         super.onViewCreated(view, savedInstanceState);
 
-        // TODO find a way to ensure LocationAutoCompleteSearchBar type
+        // TODO find a more elegant way to ensure LocationAutoCompleteSearchBar generic type
         mSearchBar = (LocationAutoCompleteSearchBar<MapboxAutocompleteLocationItem>) view.findViewById(R.id.home_fragment_search_bar);
         final GeocoderAdapter adapter = new GeocoderAdapter(view.getContext());
         adapter.setAccessToken(MapboxAccountManager.getInstance().getAccessToken());
@@ -74,12 +76,26 @@ public final class HomeFragment extends BaseMapFragment<HomePresenter, HomeView>
                 }
             }
         });
+
+        mAddLocationFAB = (FloatingActionButton) view.findViewById(R.id.home_fragment_add_location_fab);
+        mAddLocationFAB.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                if( mPresenter != null )
+                {
+                    mPresenter.onAddLocationFABClicked();
+                }
+            }
+        });
     }
 
     @Override
     public void onDestroyView()
     {
         mSearchBar = null;
+        mAddLocationFAB = null;
 
         super.onDestroyView();
     }
