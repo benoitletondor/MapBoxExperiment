@@ -2,6 +2,8 @@
     <string name="app_name">MapBoxExperiment</string>
 
     <string name="search_location_hint">Search location</string>
+    <string name="searching_hint">Searching…</string>
+    <string name="add_location_view_title">Add a location</string>
 
     <!-- Error dialogs -->
     <string name="no_location_error_title">Location unavailable</string>

@@ -5,12 +5,13 @@ import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.graphics.drawable.VectorDrawableCompat;
-import android.view.View;
 
 import com.benoitletondor.mapboxexperiment.R;
+import com.benoitletondor.mapboxexperiment.common.map.CameraCenterLocation;
 import com.benoitletondor.mapboxexperiment.common.map.MapApi;
 import com.benoitletondor.mapboxexperiment.common.map.MapLocationSource;
 import com.benoitletondor.mapboxexperiment.common.map.MapMarker;
+import com.benoitletondor.mapboxexperiment.common.map.OnCameraMoveListener;
 import com.benoitletondor.mapboxexperiment.common.map.OnMapClickListener;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
@@ -85,6 +86,14 @@ final class MapboxApi implements MapApi, MapLocationSource.OnLocationChangedList
 
     @NonNull
     @Override
+    public CameraCenterLocation getCameraCenterLocation()
+    {
+        final CameraPosition cameraPosition = mMapboxMap.getCameraPosition();
+        return new CameraCenterLocation(cameraPosition.target.getLatitude(), cameraPosition.target.getLongitude());
+    }
+
+    @NonNull
+    @Override
     public MapMarker addMarker(double latitude, double longitude, @Nullable String title, @Nullable String snippet)
     {
         final MarkerViewOptions options = new MarkerViewOptions()
@@ -117,7 +126,36 @@ final class MapboxApi implements MapApi, MapLocationSource.OnLocationChangedList
                 @Override
                 public void onMapClick(@NonNull LatLng point)
                 {
-                    listener.onClick(point.getLatitude(), point.getLongitude());
+                    listener.onMapClicked(point.getLatitude(), point.getLongitude());
+                }
+            });
+        }
+    }
+
+    @Override
+    public void setOnCameraMoveListener(@Nullable final OnCameraMoveListener listener)
+    {
+        if( listener == null )
+        {
+            mMapboxMap.setOnCameraChangeListener(null);
+        }
+        else
+        {
+            mMapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener()
+            {
+                @Nullable
+                private CameraCenterLocation mLastLocation;
+
+                @Override
+                public void onCameraChange(CameraPosition position)
+                {
+                    final CameraCenterLocation newLocation = new CameraCenterLocation(position.target.getLatitude(), position.target.getLongitude());
+                    if( !newLocation.equals(mLastLocation) )
+                    {
+                        listener.onMapCameraMove(newLocation);
+                    }
+
+                    mLastLocation = newLocation;
                 }
             });
         }

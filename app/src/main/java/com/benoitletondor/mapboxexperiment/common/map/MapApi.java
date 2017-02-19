@@ -33,6 +33,14 @@ public interface MapApi
     void moveCamera(double latitude, double longitude, double zoom, boolean animated);
 
     /**
+     * Get the current location of the camera center
+     *
+     * @return the location of the camera center
+     */
+    @NonNull
+    CameraCenterLocation getCameraCenterLocation();
+
+    /**
      * Add a marker on the map with the given attributes
      *
      * @param latitude latitude of the marker
@@ -50,4 +58,11 @@ public interface MapApi
      * @param listener the map click listener
      */
     void setOnMapClickedListener(@Nullable OnMapClickListener listener);
+
+    /**
+     * Set the map camera move listener
+     *
+     * @param listener the map camera move listener
+     */
+    void setOnCameraMoveListener(@Nullable OnCameraMoveListener listener);
 }

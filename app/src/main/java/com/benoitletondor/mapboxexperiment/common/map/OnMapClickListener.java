@@ -13,5 +13,5 @@ public interface OnMapClickListener
      * @param latitude the latitude of the touch
      * @param longitude the longitude of the touch
      */
-    void onClick(double latitude, double longitude);
+    void onMapClicked(double latitude, double longitude);
 }

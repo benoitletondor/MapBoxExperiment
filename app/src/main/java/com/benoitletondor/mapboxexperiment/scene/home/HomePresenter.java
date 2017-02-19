@@ -18,4 +18,11 @@ public interface HomePresenter extends BaseMapPresenter<HomeView>
      * Called when the user press on the add location FAB
      */
     void onAddLocationFABClicked();
+
+    /**
+     * Called when the back button is pressed by the user
+     *
+     * @return true to intercept it, false to let it go
+     */
+    boolean onBackPressed();
 }
