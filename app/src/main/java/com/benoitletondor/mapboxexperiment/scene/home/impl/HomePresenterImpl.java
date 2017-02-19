@@ -1,5 +1,6 @@
 package com.benoitletondor.mapboxexperiment.scene.home.impl;
 
+import android.location.Address;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,13 +11,24 @@ import com.benoitletondor.mapboxexperiment.common.map.MapApi;
 import com.benoitletondor.mapboxexperiment.common.map.OnCameraMoveListener;
 import com.benoitletondor.mapboxexperiment.common.map.OnMapClickListener;
 import com.benoitletondor.mapboxexperiment.common.mvp.presenter.impl.BaseMapPresenterImpl;
+import com.benoitletondor.mapboxexperiment.interactor.ReverseGeocodingInteractor;
 import com.benoitletondor.mapboxexperiment.scene.home.HomePresenter;
 import com.benoitletondor.mapboxexperiment.scene.home.HomeView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.location.LocationRequest;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
 public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> implements HomePresenter, OnMapClickListener, OnCameraMoveListener
 {
+    /**
+     * The reverse geocoding interactor, ready to be used
+     */
+    @NonNull
+    private final ReverseGeocodingInteractor mReverseGeocodingInteractor;
     /**
      * The currently displayed map (will be null until loaded and nullified on each view stop to avoid leaks)
      */
@@ -35,12 +47,19 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
      */
     @NonNull
     private AddLocationState mAddLocationState = AddLocationState.NORMAL;
+    /**
+     * Background action that perform reverse geocoding on a location, will be null if nothing happens at the moment
+     */
+    @Nullable
+    private Disposable mReverseGeocodingAction;
 
 // ------------------------------------->
 
-    public HomePresenterImpl()
+    public HomePresenterImpl(@NonNull ReverseGeocodingInteractor reverseGeocodingInteractor)
     {
-        super(true);
+        super(true, reverseGeocodingInteractor);
+
+        mReverseGeocodingInteractor = reverseGeocodingInteractor;
     }
 
     @Override
@@ -200,8 +219,38 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
             return;
         }
 
+        if( mReverseGeocodingAction != null )
+        {
+            mReverseGeocodingAction.dispose();
+        }
+
         mView.clearSearchBarContent();
-        mView.setSearchBarSearchingHint();
+
+        mReverseGeocodingAction = mReverseGeocodingInteractor
+            .reverseGeocode(cameraCenterLocation.getLatitude(), cameraCenterLocation.getLongitude())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Consumer<Address>()
+            {
+                @Override
+                public void accept(@io.reactivex.annotations.NonNull Address address) throws Exception
+                {
+                    mReverseGeocodingAction = null;
+
+                    if( mView != null )
+                    {
+                        mView.setSearchBarContent(address.toString());
+                    }
+                }
+            }, new Consumer<Throwable>()
+            {
+                @Override
+                public void accept(@io.reactivex.annotations.NonNull Throwable throwable) throws Exception
+                {
+                    mReverseGeocodingAction = null;
+                    // TODO
+                }
+            });
     }
 
     private void setViewStateNormal()
@@ -224,8 +273,9 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
             mView.disableSearchBar();
             mView.setAddLocationFABValidateIcon();
             mView.showCenterMapMarker();
-            mView.setAddLocationViewTitle();
+            mView.setSearchBarSearchingHint();
             mView.clearSearchBarContent();
+            mView.setAddLocationViewTitle();
         }
     }
 

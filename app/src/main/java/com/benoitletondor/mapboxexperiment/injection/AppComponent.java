@@ -3,6 +3,8 @@ package com.benoitletondor.mapboxexperiment.injection;
 import android.content.Context;
 
 import com.benoitletondor.mapboxexperiment.App;
+import com.benoitletondor.mapboxexperiment.common.map.ReverseGeocoder;
+import com.benoitletondor.mapboxexperiment.interactor.ReverseGeocodingInteractor;
 
 import javax.inject.Singleton;
 
@@ -15,4 +17,6 @@ public interface AppComponent
     Context getAppContext();
 
     App getApp();
+
+    ReverseGeocodingInteractor getReverseGeocodingInteracor();
 }
