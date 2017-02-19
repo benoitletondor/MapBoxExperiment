@@ -216,13 +216,12 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
                         @Override
                         public void accept(@io.reactivex.annotations.NonNull Address address) throws Exception
                         {
-                            mMap.addMarker(centerLocation.getLatitude(), centerLocation.getLongitude(), address.toString(), null); // TODO format name and save
-
                             mAddLocationState = AddLocationState.NORMAL;
                             setViewStateNormal();
 
-                            if( mView != null )
+                            if( mView != null && mMap != null )
                             {
+                                mMap.addMarker(centerLocation.getLatitude(), centerLocation.getLongitude(), mView.formatAddress(address), null); // TODO save
                                 mView.hideSavingLocationModal();
                             }
                         }
@@ -291,7 +290,7 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
 
                     if( mView != null && mAddLocationState == AddLocationState.ADDING_LOCATION )
                     {
-                        mView.setSearchBarContent(address.toString());
+                        mView.setSearchBarContent(mView.formatAddress(address));
                     }
                 }
             }, new Consumer<Throwable>()
@@ -318,6 +317,7 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
             mView.setSearchBarDefaultHint();
             mView.clearSearchBarContent();
             mView.setDefaultViewTitle();
+            mView.disableSearchBarMultilineDisplay();
         }
     }
 
@@ -334,6 +334,7 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
             mView.setSearchBarSearchingHint();
             mView.clearSearchBarContent();
             mView.setAddLocationViewTitle();
+            mView.enableSearchBarMultilineDisplay();
         }
     }
 

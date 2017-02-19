@@ -4,12 +4,12 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.benoitletondor.mapboxexperiment.App;
-import com.benoitletondor.mapboxexperiment.BuildConfig;
 import com.benoitletondor.mapboxexperiment.common.map.ReverseGeocoder;
 import com.benoitletondor.mapboxexperiment.interactor.ReverseGeocodingInteractor;
 import com.benoitletondor.mapboxexperiment.interactor.impl.ReverseGeocodingInteractorImpl;
 import com.benoitletondor.mapboxexperiment.mapbox.MapboxReverseGeocoder;
 import com.mapbox.geocoder.android.AndroidGeocoder;
+import com.mapbox.mapboxsdk.MapboxAccountManager;
 
 import java.util.Locale;
 
@@ -45,7 +45,7 @@ public final class AppModule
     public ReverseGeocoder reverseGeocoder()
     {
         final AndroidGeocoder geocoder = new AndroidGeocoder(mApp, Locale.getDefault());
-        geocoder.setAccessToken(BuildConfig.MAPBOX_API_KEY);
+        geocoder.setAccessToken(MapboxAccountManager.getInstance().getAccessToken());
 
         return new MapboxReverseGeocoder(geocoder);
     }

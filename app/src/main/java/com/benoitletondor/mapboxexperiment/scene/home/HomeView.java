@@ -1,5 +1,6 @@
 package com.benoitletondor.mapboxexperiment.scene.home;
 
+import android.location.Address;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -48,9 +49,23 @@ public interface HomeView extends BaseMapView, OnBackPressedInterceptor
     /**
      * Set the content of the search bar
      *
-     * @param content the search bar content
+     * @param content the content to display
      */
     void setSearchBarContent(@NonNull String content);
+
+    /**
+     * Format the given address for display. The targeted format is:
+     * <ul>
+     *     <li>Street number and street name</li>
+     *     <li>Postal code</li>
+     *     <li>City</li>
+     * </ul>
+     *
+     * @param address the address to format
+     * @return a human readable version of this address
+     */
+    @NonNull
+    String formatAddress(@NonNull Address address);
 
     /**
      * Hide the keyboard if shown
@@ -66,6 +81,16 @@ public interface HomeView extends BaseMapView, OnBackPressedInterceptor
      * Enable the search bar
      */
     void enableSearchBar();
+
+    /**
+     * Enable the display of multiline content into the search bar
+     */
+    void enableSearchBarMultilineDisplay();
+
+    /**
+     * Disable the display of multiline content into the search bar
+     */
+    void disableSearchBarMultilineDisplay();
 
     /**
      * Set the validate icon to the add location FAB

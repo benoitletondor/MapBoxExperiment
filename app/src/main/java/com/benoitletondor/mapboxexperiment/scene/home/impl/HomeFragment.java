@@ -3,6 +3,7 @@ package com.benoitletondor.mapboxexperiment.scene.home.impl;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.location.Address;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -94,8 +95,8 @@ public final class HomeFragment extends BaseMapFragment<HomePresenter, HomeView>
 
         // TODO find a more elegant way to ensure LocationAutoCompleteSearchBar generic type
         mSearchBar = (LocationAutoCompleteSearchBar<MapboxAutocompleteLocationItem>) view.findViewById(R.id.home_fragment_search_bar);
-        final GeocoderAdapter adapter = new GeocoderAdapter(view.getContext());
-        adapter.setAccessToken(MapboxAccountManager.getInstance().getAccessToken());
+        final GeocoderAdapter adapter = new GeocoderAdapter(view.getContext().getApplicationContext());
+        adapter.(MapboxAccountManager.getInstance().getAccessToken());
         adapter.setType(GeocodingCriteria.TYPE_PLACE);
         mSearchBar.setAdapter(new MapboxGeocoderAdapter(adapter));
 
@@ -243,6 +244,41 @@ public final class HomeFragment extends BaseMapFragment<HomePresenter, HomeView>
         mSearchBar.setText(content);
     }
 
+    @NonNull
+    @Override
+    public String formatAddress(@NonNull Address address)
+    {
+        final StringBuilder builder = new StringBuilder();
+
+        final String addressLine = address.getAddressLine(0);
+        if( addressLine != null )
+        {
+            builder.append(address.getAddressLine(0).substring(0, addressLine.indexOf(",")));
+        }
+
+        if( address.getPostalCode() != null )
+        {
+            if( builder.length() > 0 )
+            {
+                builder.append(", ");
+            }
+
+            builder.append(address.getPostalCode());
+        }
+
+        if( address.getLocality() != null )
+        {
+            if( builder.length() > 0 )
+            {
+                builder.append(", ");
+            }
+
+            builder.append(address.getLocality());
+        }
+
+        return builder.toString();
+    }
+
     @Override
     public void hideKeyboard()
     {
@@ -269,6 +305,21 @@ public final class HomeFragment extends BaseMapFragment<HomePresenter, HomeView>
     public void enableSearchBar()
     {
         mSearchBar.setEnabled(true);
+        mSearchBar.setMaxLines(2);
+    }
+
+    @Override
+    public void enableSearchBarMultilineDisplay()
+    {
+        mSearchBar.setMaxLines(3);
+        mSearchBar.setSingleLine(false);
+    }
+
+    @Override
+    public void disableSearchBarMultilineDisplay()
+    {
+        mSearchBar.setMaxLines(1);
+        mSearchBar.setSingleLine(true);
     }
 
     @Override
