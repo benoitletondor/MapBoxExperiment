@@ -96,7 +96,7 @@ public final class HomeFragment extends BaseMapFragment<HomePresenter, HomeView>
         // TODO find a more elegant way to ensure LocationAutoCompleteSearchBar generic type
         mSearchBar = (LocationAutoCompleteSearchBar<MapboxAutocompleteLocationItem>) view.findViewById(R.id.home_fragment_search_bar);
         final GeocoderAdapter adapter = new GeocoderAdapter(view.getContext().getApplicationContext());
-        adapter.(MapboxAccountManager.getInstance().getAccessToken());
+        adapter.setAccessToken(MapboxAccountManager.getInstance().getAccessToken());
         adapter.setType(GeocodingCriteria.TYPE_PLACE);
         mSearchBar.setAdapter(new MapboxGeocoderAdapter(adapter));
 

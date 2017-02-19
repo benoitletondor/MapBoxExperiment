@@ -1,5 +1,6 @@
 package com.benoitletondor.mapboxexperiment.mapbox;
 
+import android.database.DataSetObserver;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,72 @@ public final class MapboxGeocoderAdapter extends BaseAdapter implements Filterab
     }
 
 // ----------------------------------->
+
+    @Override
+    public boolean hasStableIds()
+    {
+        return mAdapter.hasStableIds();
+    }
+
+    @Override
+    public void registerDataSetObserver(DataSetObserver observer)
+    {
+        mAdapter.registerDataSetObserver(observer);
+    }
+
+    @Override
+    public void unregisterDataSetObserver(DataSetObserver observer)
+    {
+        mAdapter.unregisterDataSetObserver(observer);
+    }
+
+    @Override
+    public void notifyDataSetChanged()
+    {
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void notifyDataSetInvalidated()
+    {
+        mAdapter.notifyDataSetInvalidated();
+    }
+
+    @Override
+    public boolean areAllItemsEnabled()
+    {
+        return mAdapter.areAllItemsEnabled();
+    }
+
+    @Override
+    public boolean isEnabled(int position)
+    {
+        return mAdapter.isEnabled(position);
+    }
+
+    @Override
+    public View getDropDownView(int position, View convertView, ViewGroup parent)
+    {
+        return mAdapter.getDropDownView(position, convertView, parent);
+    }
+
+    @Override
+    public int getItemViewType(int position)
+    {
+        return mAdapter.getItemViewType(position);
+    }
+
+    @Override
+    public int getViewTypeCount()
+    {
+        return mAdapter.getViewTypeCount();
+    }
+
+    @Override
+    public boolean isEmpty()
+    {
+        return mAdapter.isEmpty();
+    }
 
     @Override
     public int getCount()
