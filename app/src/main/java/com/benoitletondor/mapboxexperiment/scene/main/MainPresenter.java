@@ -9,5 +9,8 @@ import com.benoitletondor.mapboxexperiment.common.mvp.presenter.BasePresenter;
  */
 public interface MainPresenter extends BasePresenter<MainView>
 {
-
+    /**
+     * Called when the user presses the home button from the drawer menu
+     */
+    void onHomeButtonClicked();
 }

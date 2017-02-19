@@ -6,6 +6,13 @@
     <string name="add_location_view_title">Add a location</string>
     <string name="saving_location">Saving location…</string>
     <string name="please_wait">Please wait</string>
+    <string name="made_by">Made by Benoit Letondor</string>
+
+    <string name="home">Home</string>
+    <string name="history">History</string>
+
+    <string name="open_drawer">Open menu</string>
+    <string name="close_drawer">Close menu</string>
 
     <!-- Error dialogs -->
     <string name="no_location_error_title">Location unavailable</string>

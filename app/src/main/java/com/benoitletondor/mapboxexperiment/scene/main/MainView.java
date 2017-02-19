@@ -17,4 +17,9 @@ public interface MainView
      * @param title the view title
      */
     void setViewTitle(@NonNull String title);
+
+    /**
+     * Show the home view
+     */
+    void showHomeView();
 }

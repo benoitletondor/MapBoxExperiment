@@ -27,36 +27,42 @@ public class LimitedSizeList<E> extends LinkedList<E>
 
 // -------------------------------->
 
+    @Deprecated
     @Override
     public void addLast(E e)
     {
         throw new IllegalStateException();
     }
 
+    @Deprecated
     @Override
     public void addFirst(E e)
     {
         throw new IllegalStateException();
     }
 
+    @Deprecated
     @Override
     public boolean add(E e)
     {
         throw new IllegalStateException();
     }
 
+    @Deprecated
     @Override
     public boolean addAll(Collection<? extends E> c)
     {
         throw new IllegalStateException();
     }
 
+    @Deprecated
     @Override
     public boolean addAll(int index, Collection<? extends E> c)
     {
         throw new IllegalStateException();
     }
 
+    @Deprecated
     @Override
     public void add(int index, E element)
     {

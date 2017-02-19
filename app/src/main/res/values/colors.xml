@@ -6,4 +6,6 @@
 
     <color name="add_location_fab_default_color">@color/colorAccent</color>
     <color name="add_location_fab_validate_color">#4CAF50</color>
+
+    <color name="not_selected_menu_item">#777</color>
 </resources>
