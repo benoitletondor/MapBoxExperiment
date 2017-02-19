@@ -12,6 +12,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.Filterable;
+import android.widget.ListAdapter;
 
 import com.benoitletondor.mapboxexperiment.R;
 import com.benoitletondor.mapboxexperiment.common.map.AutoCompleteLocationItem;
@@ -23,7 +25,7 @@ import com.benoitletondor.mapboxexperiment.common.map.AutoCompleteLocationItem;
  *
  * @param <L> type of item returned by the adapter.
  */
-public class LocationAutoCompleteSearchBar<L extends AutoCompleteLocationItem> extends AutoCompleteTextView implements TextWatcher
+public class LocationAutoCompleteSearchBar<L extends AutoCompleteLocationItem, T extends ListAdapter & Filterable> extends AutoCompleteTextView implements TextWatcher
 {
     /**
      * Listener for location click, can be null
@@ -35,6 +37,11 @@ public class LocationAutoCompleteSearchBar<L extends AutoCompleteLocationItem> e
      */
     @NonNull
     private final Drawable mClearButtonDrawable;
+    /**
+     * Saved adapter stored while view is disabled to avoid sending request
+     */
+    @Nullable
+    private T mTempDisabledAdapter;
 
 // ---------------------------------->
 
@@ -88,20 +95,35 @@ public class LocationAutoCompleteSearchBar<L extends AutoCompleteLocationItem> e
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void setEnabled(boolean enabled)
     {
+
+
         super.setEnabled(enabled);
 
-        // Remove the clear button when disabled
+        // Remove the clear button when disabled and remove any adapter to avoid triggering useless searches
         if( !enabled )
         {
             hideClearButton();
+
+            if( getAdapter() != null )
+            {
+                mTempDisabledAdapter = (T) getAdapter();
+                setAdapter(null);
+            }
         }
-        // Put it back when enabled
+        // Put them back when enabled
         else
         {
             showClearButton();
+
+            if( mTempDisabledAdapter != null )
+            {
+                setAdapter(mTempDisabledAdapter);
+                mTempDisabledAdapter = null;
+            }
         }
     }
 
