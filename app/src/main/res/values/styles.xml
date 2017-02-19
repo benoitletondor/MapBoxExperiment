@@ -5,13 +5,6 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="toolbarStyle">@style/ToolBar</item>
-        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item> <!-- Hardware button menu -->
-    </style>
-
-    <!-- Style of the ToolBar. -->
-    <style name="ToolBar" parent="Widget.AppCompat.Toolbar">
-        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
     </style>
 
     <!-- Theme used by every ToolBar in the app. -->

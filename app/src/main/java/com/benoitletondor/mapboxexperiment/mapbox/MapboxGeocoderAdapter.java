@@ -2,11 +2,13 @@ package com.benoitletondor.mapboxexperiment.mapbox;
 
 import android.database.DataSetObserver;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.TextView;
 
 import com.mapbox.services.android.geocoder.ui.GeocoderAdapter;
 
@@ -117,7 +119,14 @@ public final class MapboxGeocoderAdapter extends BaseAdapter implements Filterab
     @Override
     public View getView(int i, View view, ViewGroup viewGroup)
     {
-        return mAdapter.getView(i, view, viewGroup);
+        final View v = mAdapter.getView(i, view, viewGroup);
+
+        if( v instanceof TextView )
+        {
+            ((TextView) v).setTextColor(ContextCompat.getColor(v.getContext(), android.R.color.black));
+        }
+
+        return v;
     }
 
     @Override
