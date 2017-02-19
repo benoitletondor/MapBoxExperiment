@@ -14,6 +14,11 @@ import java.util.concurrent.Callable;
 
 import io.reactivex.Observable;
 
+/**
+ * Implementation of {@link ReverseGeocodingInteractor}
+ *
+ * @author Benoit LETONDOR
+ */
 public final class ReverseGeocodingInteractorImpl extends BaseInteractorImpl implements ReverseGeocodingInteractor
 {
     @NonNull

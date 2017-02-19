@@ -7,6 +7,11 @@ import com.benoitletondor.mapboxexperiment.common.mvp.interactor.BaseInteractor;
 
 import io.reactivex.Observable;
 
+/**
+ * Interactor that performs reverse geocoding actions
+ *
+ * @author Benoit LETONDOR
+ */
 public interface ReverseGeocodingInteractor extends BaseInteractor
 {
     @NonNull

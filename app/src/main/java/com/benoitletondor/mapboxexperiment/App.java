@@ -9,6 +9,11 @@ import com.benoitletondor.mapboxexperiment.injection.DaggerAppComponent;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.squareup.leakcanary.LeakCanary;
 
+/**
+ * Entry point of the application
+ *
+ * @author Benoit LETONDOR
+ */
 public final class App extends Application
 {
     /**
@@ -34,6 +39,11 @@ public final class App extends Application
 
 // ---------------------------------->
 
+    /**
+     * Return the dagger app component
+     *
+     * @return the app component
+     */
     @NonNull
     public AppComponent getAppComponent()
     {

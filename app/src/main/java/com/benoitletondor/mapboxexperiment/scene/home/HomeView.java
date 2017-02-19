@@ -7,6 +7,12 @@ import android.support.annotation.UiThread;
 import com.benoitletondor.mapboxexperiment.common.OnBackPressedInterceptor;
 import com.benoitletondor.mapboxexperiment.common.mvp.view.BaseMapView;
 
+/**
+ * The home view that displays a map and handles map interactions such as searching for an address
+ * or adding a pin
+ *
+ * @author Benoit LETONDOR
+ */
 @UiThread
 public interface HomeView extends BaseMapView, OnBackPressedInterceptor
 {
@@ -100,4 +106,19 @@ public interface HomeView extends BaseMapView, OnBackPressedInterceptor
      * Set the view title to add location
      */
     void setAddLocationViewTitle();
+
+    /**
+     * Show a modal indicating to the user that the current location is being saved
+     */
+    void showSavingLocationModal();
+
+    /**
+     * Hide the saving location modal
+     */
+    void hideSavingLocationModal();
+
+    /**
+     * Show an error indicating to the user the location failed to be saved
+     */
+    void showSavingLocationError();
 }

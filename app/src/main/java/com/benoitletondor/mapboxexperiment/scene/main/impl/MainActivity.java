@@ -18,8 +18,16 @@ import com.benoitletondor.mapboxexperiment.scene.main.injection.MainViewModule;
 
 import javax.inject.Inject;
 
+/**
+ * Implementation of the {@link MainView}
+ *
+ * @author Benoit LETONDOR
+ */
 public final class MainActivity extends BaseActivity<MainPresenter, MainView> implements MainView
 {
+    /**
+     * Presenter factory, used by MVP
+     */
     @Inject
     PresenterFactory<MainPresenter> mPresenterFactory;
 
@@ -72,6 +80,8 @@ public final class MainActivity extends BaseActivity<MainPresenter, MainView> im
     {
         return mPresenterFactory;
     }
+
+// -------------------------------->
 
     @Override
     public void setViewTitle(@NonNull String title)

@@ -5,6 +5,11 @@ import android.support.annotation.NonNull;
 import com.benoitletondor.mapboxexperiment.common.map.AutoCompleteLocationItem;
 import com.benoitletondor.mapboxexperiment.common.mvp.presenter.BaseMapPresenter;
 
+/**
+ * Presenter for the {@link HomeView}
+ *
+ * @author Benoit LETONDOR
+ */
 public interface HomePresenter extends BaseMapPresenter<HomeView>
 {
     /**

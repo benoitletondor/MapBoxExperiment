@@ -1,5 +1,6 @@
 package com.benoitletondor.mapboxexperiment.scene.home.impl;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
@@ -35,15 +36,40 @@ import com.mapbox.services.geocoding.v5.GeocodingCriteria;
 
 import javax.inject.Inject;
 
+/**
+ * Implementation of the {@link HomeView}
+ *
+ * @author Benoit LETONDOR
+ */
 public final class HomeFragment extends BaseMapFragment<HomePresenter, HomeView> implements HomeView
 {
+    /**
+     * Presenter factory, used by MVP
+     */
     @Inject
     PresenterFactory<HomePresenter> mPresenterFactory;
+    /**
+     * The instance of {@link MainView} this fragment is currently attached to. Will be null if detached
+     */
     @Nullable
     private MainView mMainView;
+    /**
+     * The progress dialog shown to indicate a location is being saved to the user. Will be null is not shown
+     */
+    @Nullable
+    private ProgressDialog mSavingLocationProgressDialog;
 
+    /**
+     * Search bar XML element
+     */
     private LocationAutoCompleteSearchBar<MapboxAutocompleteLocationItem> mSearchBar;
+    /**
+     * Add location FAB XML element
+     */
     private FloatingActionButton mAddLocationFAB;
+    /**
+     * Center of map marker ImageView XML element
+     */
     private ImageView mCenterMapMarkerImageView;
 
 // ---------------------------------->
@@ -108,6 +134,12 @@ public final class HomeFragment extends BaseMapFragment<HomePresenter, HomeView>
         mAddLocationFAB = null;
         mCenterMapMarkerImageView = null;
 
+        if( mSavingLocationProgressDialog != null )
+        {
+            mSavingLocationProgressDialog.dismiss();
+            mSavingLocationProgressDialog = null;
+        }
+
         super.onDestroyView();
     }
 
@@ -133,12 +165,7 @@ public final class HomeFragment extends BaseMapFragment<HomePresenter, HomeView>
     @Override
     public boolean onBackPressed()
     {
-        if( mPresenter == null )
-        {
-            return false;
-        }
-
-        return mPresenter.onBackPressed();
+        return mPresenter != null && mPresenter.onBackPressed();
     }
 
 // ---------------------------------->
@@ -298,5 +325,36 @@ public final class HomeFragment extends BaseMapFragment<HomePresenter, HomeView>
         {
             mMainView.setViewTitle(getString(R.string.add_location_view_title));
         }
+    }
+
+    @Override
+    public void showSavingLocationModal()
+    {
+        mSavingLocationProgressDialog = ProgressDialog.show(
+            getContext(),
+            getString(R.string.saving_location),
+            getString(R.string.please_wait),
+            true,
+            false);
+    }
+
+    @Override
+    public void hideSavingLocationModal()
+    {
+        if( mSavingLocationProgressDialog != null )
+        {
+            mSavingLocationProgressDialog.dismiss();
+            mSavingLocationProgressDialog = null;
+        }
+    }
+
+    @Override
+    public void showSavingLocationError()
+    {
+        new AlertDialog.Builder(getContext())
+            .setTitle(R.string.save_location_error_title)
+            .setMessage(R.string.save_location_error_message)
+            .setPositiveButton(android.R.string.ok, null)
+            .show();
     }
 }

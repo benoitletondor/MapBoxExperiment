@@ -4,6 +4,11 @@ import com.benoitletondor.mapboxexperiment.common.mvp.presenter.impl.BasePresent
 import com.benoitletondor.mapboxexperiment.scene.main.MainPresenter;
 import com.benoitletondor.mapboxexperiment.scene.main.MainView;
 
+/**
+ * Implementation of the {@link MainPresenter}
+ *
+ * @author Benoit LETONDOR
+ */
 public final class MainPresenterImpl extends BasePresenterImpl<MainView> implements MainPresenter
 {
     public MainPresenterImpl()

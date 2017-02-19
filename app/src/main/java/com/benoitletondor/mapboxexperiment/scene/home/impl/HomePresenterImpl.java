@@ -22,6 +22,11 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
+/**
+ * Implementation of the {@link HomePresenter}
+ *
+ * @author Benoit LETONDOR
+ */
 public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> implements HomePresenter, OnMapClickListener, OnCameraMoveListener
 {
     /**
@@ -75,10 +80,14 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
             switch (mAddLocationState)
             {
                 case NORMAL:
-                    // Nothing to do here since the view is already init in normal state
+                    setViewStateNormal();
                     break;
                 case ADDING_LOCATION:
                     setViewStateAddingLocation();
+                    break;
+                case SAVING_LOCATION:
+                    setViewStateNormal();
+                    mView.showSavingLocationModal();
                     break;
             }
         }
@@ -177,7 +186,7 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
     @Override
     public void onAddLocationFABClicked()
     {
-        if( mMap == null )
+        if( mMap == null || mAddLocationState == AddLocationState.SAVING_LOCATION )
         {
             return;
         }
@@ -191,10 +200,47 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
                 break;
             case ADDING_LOCATION:
                 final CameraCenterLocation centerLocation = mMap.getCameraCenterLocation();
-                mMap.addMarker(centerLocation.getLatitude(), centerLocation.getLongitude(), null, null); // TODO add name and save
-
-                mAddLocationState = AddLocationState.NORMAL;
+                mAddLocationState = AddLocationState.SAVING_LOCATION;
                 setViewStateNormal();
+
+                if( mView != null )
+                {
+                    mView.showSavingLocationModal();
+                }
+
+                addSubscription(mReverseGeocodingInteractor.reverseGeocode(centerLocation.getLatitude(), centerLocation.getLongitude())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<Address>()
+                    {
+                        @Override
+                        public void accept(@io.reactivex.annotations.NonNull Address address) throws Exception
+                        {
+                            mMap.addMarker(centerLocation.getLatitude(), centerLocation.getLongitude(), address.toString(), null); // TODO format name and save
+
+                            mAddLocationState = AddLocationState.NORMAL;
+                            setViewStateNormal();
+
+                            if( mView != null )
+                            {
+                                mView.hideSavingLocationModal();
+                            }
+                        }
+                    }, new Consumer<Throwable>()
+                    {
+                        @Override
+                        public void accept(@io.reactivex.annotations.NonNull Throwable throwable) throws Exception
+                        {
+                            mAddLocationState = AddLocationState.NORMAL;
+                            setViewStateNormal();
+
+                            if( mView != null )
+                            {
+                                mView.hideSavingLocationModal();
+                                mView.showSavingLocationError();
+                            }
+                        }
+                    }));
                 break;
         }
     }
@@ -212,6 +258,12 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
         return false;
     }
 
+    /**
+     * Start reverse geocoding for the given location. Will cancel any previous reverse geocoding
+     * action started.
+     *
+     * @param cameraCenterLocation the camera location
+     */
     private void reverseGeocodingForLocation(@NonNull CameraCenterLocation cameraCenterLocation)
     {
         if( mView == null )
@@ -226,7 +278,7 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
 
         mView.clearSearchBarContent();
 
-        mReverseGeocodingAction = mReverseGeocodingInteractor
+        mReverseGeocodingAction = addSubscription(mReverseGeocodingInteractor
             .reverseGeocode(cameraCenterLocation.getLatitude(), cameraCenterLocation.getLongitude())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -237,7 +289,7 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
                 {
                     mReverseGeocodingAction = null;
 
-                    if( mView != null )
+                    if( mView != null && mAddLocationState == AddLocationState.ADDING_LOCATION )
                     {
                         mView.setSearchBarContent(address.toString());
                     }
@@ -250,9 +302,12 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
                     mReverseGeocodingAction = null;
                     // TODO
                 }
-            });
+            }));
     }
 
+    /**
+     * Update the view for the normal state. Will do nothing is view is null
+     */
     private void setViewStateNormal()
     {
         if( mView != null )
@@ -266,6 +321,9 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
         }
     }
 
+    /**
+     * Update the view for the adding location state. Will do nothing is view is null
+     */
     private void setViewStateAddingLocation()
     {
         if( mView != null )
@@ -311,6 +369,11 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
         /**
          * User is currently adding a location
          */
-        ADDING_LOCATION
+        ADDING_LOCATION,
+
+        /**
+         * Location added by user is currently being saved (waiting for reverse geocoder)
+         */
+        SAVING_LOCATION
     }
 }

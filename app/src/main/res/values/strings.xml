@@ -4,6 +4,8 @@
     <string name="search_location_hint">Search location</string>
     <string name="searching_hint">Searching…</string>
     <string name="add_location_view_title">Add a location</string>
+    <string name="saving_location">Saving location…</string>
+    <string name="please_wait">Please wait</string>
 
     <!-- Error dialogs -->
     <string name="no_location_error_title">Location unavailable</string>
@@ -12,4 +14,6 @@
     <string name="location_permission_denied_message">Location permission has been denied, device location won\'t be available on the map</string>
     <string name="map_loading_error_title">Map unavailable</string>
     <string name="map_loading_error_message">An error occurred while loading the map: %s</string>
+    <string name="save_location_error_title">Unable to add location</string>
+    <string name="save_location_error_message">An error occurred while saving the location, try again later</string>
 </resources>
