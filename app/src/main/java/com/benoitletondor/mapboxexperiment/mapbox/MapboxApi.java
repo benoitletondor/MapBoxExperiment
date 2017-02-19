@@ -113,6 +113,17 @@ final class MapboxApi implements MapApi, MapLocationSource.OnLocationChangedList
     }
 
     @Override
+    public void removeMarker(@NonNull MapMarker marker)
+    {
+        if( !(marker instanceof MapboxMarker) )
+        {
+            throw new IllegalStateException("Cannot call remove marker without a mapbox marker");
+        }
+
+        mMapboxMap.removeMarker(((MapboxMarker)marker).mMarker);
+    }
+
+    @Override
     public void setOnMapClickedListener(@Nullable final OnMapClickListener listener)
     {
         if( listener == null )

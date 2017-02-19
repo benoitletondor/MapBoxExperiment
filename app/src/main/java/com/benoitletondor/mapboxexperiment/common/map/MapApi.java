@@ -53,6 +53,13 @@ public interface MapApi
     MapMarker addMarker(double latitude, double longitude, @Nullable String title, @Nullable String snippet);
 
     /**
+     * Remove the given marker from the map
+     *
+     * @param marker removed marker
+     */
+    void removeMarker(@NonNull MapMarker marker);
+
+    /**
      * Set the map click listener
      *
      * @param listener the map click listener

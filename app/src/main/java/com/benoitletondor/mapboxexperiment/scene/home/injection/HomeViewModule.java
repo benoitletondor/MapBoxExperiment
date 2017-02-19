@@ -3,6 +3,7 @@ package com.benoitletondor.mapboxexperiment.scene.home.injection;
 import android.support.annotation.NonNull;
 
 import com.benoitletondor.mapboxexperiment.common.mvp.presenter.loader.PresenterFactory;
+import com.benoitletondor.mapboxexperiment.interactor.MarkerStorageInteractor;
 import com.benoitletondor.mapboxexperiment.interactor.ReverseGeocodingInteractor;
 import com.benoitletondor.mapboxexperiment.scene.home.HomePresenter;
 import com.benoitletondor.mapboxexperiment.scene.home.impl.HomePresenterImpl;
@@ -14,7 +15,9 @@ import dagger.Provides;
 public final class HomeViewModule
 {
     @Provides
-    public PresenterFactory<HomePresenter> providePresenterFactory(@NonNull final ReverseGeocodingInteractor reverseGeocodingInteractor)
+    public PresenterFactory<HomePresenter> providePresenterFactory(
+        @NonNull final ReverseGeocodingInteractor reverseGeocodingInteractor,
+        @NonNull final MarkerStorageInteractor markerStorageInteractor)
     {
         return new PresenterFactory<HomePresenter>()
         {
@@ -22,7 +25,7 @@ public final class HomeViewModule
             @Override
             public HomePresenter create()
             {
-                return new HomePresenterImpl(reverseGeocodingInteractor);
+                return new HomePresenterImpl(reverseGeocodingInteractor, markerStorageInteractor);
             }
         };
     }

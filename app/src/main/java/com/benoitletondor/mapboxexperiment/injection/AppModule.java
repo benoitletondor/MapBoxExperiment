@@ -5,7 +5,9 @@ import android.support.annotation.NonNull;
 
 import com.benoitletondor.mapboxexperiment.App;
 import com.benoitletondor.mapboxexperiment.common.map.ReverseGeocoder;
+import com.benoitletondor.mapboxexperiment.interactor.MarkerStorageInteractor;
 import com.benoitletondor.mapboxexperiment.interactor.ReverseGeocodingInteractor;
+import com.benoitletondor.mapboxexperiment.interactor.impl.MarkerStorageInteractorImpl;
 import com.benoitletondor.mapboxexperiment.interactor.impl.ReverseGeocodingInteractorImpl;
 import com.benoitletondor.mapboxexperiment.mapbox.MapboxReverseGeocoder;
 import com.mapbox.geocoder.android.AndroidGeocoder;
@@ -55,5 +57,12 @@ public final class AppModule
     public ReverseGeocodingInteractor provideReverseGeocoderInteractor(@NonNull ReverseGeocoder reverseGeocoder)
     {
         return new ReverseGeocodingInteractorImpl(reverseGeocoder);
+    }
+
+    @Singleton
+    @Provides
+    public MarkerStorageInteractor provideMarkerStorageInteractor(@NonNull Context context)
+    {
+        return new MarkerStorageInteractorImpl(context);
     }
 }

@@ -1,6 +1,7 @@
 package com.benoitletondor.mapboxexperiment.mapbox;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.benoitletondor.mapboxexperiment.common.map.MapMarker;
 import com.mapbox.mapboxsdk.annotations.Marker;
@@ -13,7 +14,7 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 final class MapboxMarker implements MapMarker
 {
     @NonNull
-    private final Marker mMarker;
+    final Marker mMarker;
 
 // ----------------------------------->
 
@@ -23,4 +24,30 @@ final class MapboxMarker implements MapMarker
     }
 
 // ----------------------------------->
+
+    @Override
+    public double getLatitude()
+    {
+        return mMarker.getPosition().getLatitude();
+    }
+
+    @Override
+    public double getLongitude()
+    {
+        return mMarker.getPosition().getLongitude();
+    }
+
+    @Nullable
+    @Override
+    public String getName()
+    {
+        return mMarker.getTitle();
+    }
+
+    @Nullable
+    @Override
+    public String getCaption()
+    {
+        return mMarker.getSnippet();
+    }
 }

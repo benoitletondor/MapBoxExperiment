@@ -4,22 +4,31 @@ import android.location.Address;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
+import com.benoitletondor.mapboxexperiment.common.LimitedSizeList;
 import com.benoitletondor.mapboxexperiment.common.map.AutoCompleteLocationItem;
 import com.benoitletondor.mapboxexperiment.common.map.CameraCenterLocation;
 import com.benoitletondor.mapboxexperiment.common.map.MapApi;
+import com.benoitletondor.mapboxexperiment.common.map.MapMarker;
 import com.benoitletondor.mapboxexperiment.common.map.OnCameraMoveListener;
 import com.benoitletondor.mapboxexperiment.common.map.OnMapClickListener;
 import com.benoitletondor.mapboxexperiment.common.mvp.presenter.impl.BaseMapPresenterImpl;
+import com.benoitletondor.mapboxexperiment.interactor.MarkerStorageInteractor;
 import com.benoitletondor.mapboxexperiment.interactor.ReverseGeocodingInteractor;
 import com.benoitletondor.mapboxexperiment.scene.home.HomePresenter;
 import com.benoitletondor.mapboxexperiment.scene.home.HomeView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.location.LocationRequest;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -29,11 +38,18 @@ import io.reactivex.schedulers.Schedulers;
  */
 public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> implements HomePresenter, OnMapClickListener, OnCameraMoveListener
 {
+    private static final String TAG = "HomePresenter";
+
     /**
      * The reverse geocoding interactor, ready to be used
      */
     @NonNull
     private final ReverseGeocodingInteractor mReverseGeocodingInteractor;
+    /**
+     * The marker storage interactor, ready to be used
+     */
+    @NonNull
+    private final MarkerStorageInteractor mMarkerStorageInteractor;
     /**
      * The currently displayed map (will be null until loaded and nullified on each view stop to avoid leaks)
      */
@@ -53,6 +69,11 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
     @NonNull
     private AddLocationState mAddLocationState = AddLocationState.NORMAL;
     /**
+     * List that stores the shown markers
+     */
+    @NonNull
+    private LimitedSizeList<MapMarker> mMarkers = new LimitedSizeList<>(15);
+    /**
      * Background action that perform reverse geocoding on a location, will be null if nothing happens at the moment
      */
     @Nullable
@@ -60,11 +81,14 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
 
 // ------------------------------------->
 
-    public HomePresenterImpl(@NonNull ReverseGeocodingInteractor reverseGeocodingInteractor)
+    public HomePresenterImpl(
+        @NonNull ReverseGeocodingInteractor reverseGeocodingInteractor,
+        @NonNull MarkerStorageInteractor markerStorageInteractor)
     {
-        super(true, reverseGeocodingInteractor);
+        super(true, reverseGeocodingInteractor, markerStorageInteractor);
 
         mReverseGeocodingInteractor = reverseGeocodingInteractor;
+        mMarkerStorageInteractor = markerStorageInteractor;
     }
 
     @Override
@@ -104,6 +128,8 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
             mMap = null;
         }
 
+        mMarkers.clear();
+
         super.onStop();
     }
 
@@ -135,6 +161,9 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
         mMap = map;
         mMap.setOnMapClickedListener(this);
         mMap.setOnCameraMoveListener(this);
+
+        // FIXME implement a better way than reload all data on each view start
+        loadMarkers();
     }
 
     @Override
@@ -171,7 +200,7 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
     {
         if( mMap != null )
         {
-            mMap.addMarker(item.getLatitude(), item.getLongitude(), item.getLocationName(), null); // TODO save
+            addMarker(item.getLatitude(), item.getLongitude(), item.getLocationName(), null);
             mMap.moveCamera(item.getLatitude(), item.getLongitude(), 14f, true);
 
             if( mView != null )
@@ -221,7 +250,7 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
 
                             if( mView != null && mMap != null )
                             {
-                                mMap.addMarker(centerLocation.getLatitude(), centerLocation.getLongitude(), mView.formatAddress(address), null); // TODO save
+                                addMarker(centerLocation.getLatitude(), centerLocation.getLongitude(), mView.formatAddress(address), null);
                                 mView.hideSavingLocationModal();
                             }
                         }
@@ -232,6 +261,8 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
                         {
                             mAddLocationState = AddLocationState.NORMAL;
                             setViewStateNormal();
+
+                            Log.e(TAG, "Error while reverse geocoding for saving location", throwable);
 
                             if( mView != null )
                             {
@@ -299,6 +330,8 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
                 public void accept(@io.reactivex.annotations.NonNull Throwable throwable) throws Exception
                 {
                     mReverseGeocodingAction = null;
+                    Log.e(TAG, "Error while reverse geocoding", throwable);
+
                     // TODO
                 }
             }));
@@ -336,6 +369,101 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
             mView.setAddLocationViewTitle();
             mView.enableSearchBarMultilineDisplay();
         }
+    }
+
+    /**
+     * Load markers from storage and put them into {@link #mMarkers} list asynchronously
+     * FIXME concurrency is not handled properly here: what happens if the map gets re-created while loading
+     */
+    private void loadMarkers()
+    {
+        addSubscription(mMarkerStorageInteractor.retrieveStoredMarkers()
+            .map(new Function<List<MarkerStorageInteractor.StoredMarker>, List<MapMarker>>()
+            {
+                @Override
+                public List<MapMarker> apply(@io.reactivex.annotations.NonNull List<MarkerStorageInteractor.StoredMarker> markers) throws Exception
+                {
+                    if( mMap == null )
+                    {
+                        throw new Exception("Map is null");
+                    }
+
+                    for( MarkerStorageInteractor.StoredMarker marker : markers )
+                    {
+                        mMarkers.addWithLimit(
+                            mMap.addMarker(marker.getLatitude(), marker.getLongitude(), marker.getName(), marker.getCaption()));
+                    }
+
+                    return mMarkers;
+                }
+            })
+            .ignoreElements()
+            .subscribeOn(Schedulers.computation())
+            .subscribe(new Action()
+            {
+                @Override
+                public void run() throws Exception
+                {
+                    Log.d(TAG, "Markers load");
+                }
+            }, new Consumer<Throwable>()
+            {
+                @Override
+                public void accept(@io.reactivex.annotations.NonNull Throwable throwable) throws Exception
+                {
+                    Log.e(TAG, "Error loading markers", throwable);
+                }
+            }));
+    }
+
+    /**
+     * Add a marker to the map, handle list limit and asynchronously save the marker list
+     *
+     * @param latitude latitude of the marker to add
+     * @param longitude longitude of the marker to add
+     * @param name name of the marker to add
+     * @param caption caption of the marker to add
+     */
+    private void addMarker(double latitude, double longitude, @Nullable String name, @Nullable String caption)
+    {
+        if( mMap == null )
+        {
+            return;
+        }
+
+        final MapMarker removed = mMarkers.addWithLimit(
+            mMap.addMarker(latitude, longitude, name, caption));
+
+        if( removed != null )
+        {
+            mMap.removeMarker(removed);
+        }
+
+        saveMarkers();
+    }
+
+    /**
+     * Save the markers to storage asynchronously
+     */
+    private void saveMarkers()
+    {
+        addSubscription(mMarkerStorageInteractor.storeMarkers(new ArrayList<>(mMarkers))
+            .subscribeOn(Schedulers.computation())
+            .subscribe(new Action()
+            {
+                @Override
+                public void run() throws Exception
+                {
+                    Log.d(TAG, "Marker saved");
+                }
+            }, new Consumer<Throwable>()
+            {
+                @Override
+                public void accept(@io.reactivex.annotations.NonNull Throwable throwable) throws Exception
+                {
+                    Log.e(TAG, "Error while saving markers", throwable);
+                }
+            }));
     }
 
 // ------------------------------------->
