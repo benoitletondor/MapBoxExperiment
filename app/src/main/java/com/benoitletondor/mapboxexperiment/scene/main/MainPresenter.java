@@ -13,4 +13,9 @@ public interface MainPresenter extends BasePresenter<MainView>
      * Called when the user presses the home button from the drawer menu
      */
     void onHomeButtonClicked();
+
+    /**
+     * Called when the user pressed the history button from the drawer menu
+     */
+    void onHistoryButtonClicked();
 }

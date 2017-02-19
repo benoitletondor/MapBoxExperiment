@@ -12,20 +12,20 @@ import com.benoitletondor.mapboxexperiment.scene.main.MainView;
 public final class MainPresenterImpl extends BasePresenterImpl<MainView> implements MainPresenter
 {
     @Override
-    public void onStart(boolean viewCreated)
-    {
-        super.onStart(viewCreated);
-        assert mView != null;
-
-
-    }
-
-    @Override
     public void onHomeButtonClicked()
     {
         if( mView != null )
         {
             mView.showHomeView();
+        }
+    }
+
+    @Override
+    public void onHistoryButtonClicked()
+    {
+        if( mView != null )
+        {
+            mView.showHistoryView();
         }
     }
 }

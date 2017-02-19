@@ -22,4 +22,9 @@ public interface MainView
      * Show the home view
      */
     void showHomeView();
+
+    /**
+     * Show the history view
+     */
+    void showHistoryView();
 }

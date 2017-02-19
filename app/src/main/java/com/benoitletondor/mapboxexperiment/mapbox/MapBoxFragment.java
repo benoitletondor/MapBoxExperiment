@@ -9,12 +9,20 @@ import android.view.ViewGroup;
 
 import com.benoitletondor.mapboxexperiment.common.map.MapLoadingCallback;
 import com.benoitletondor.mapboxexperiment.common.map.MapViewFragment;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 /**
- * Mapbox implementation of the {@link MapViewFragment}
+ * Mapbox implementation of the {@link MapViewFragment}.
+ *
+ * This implementation contains an ugly hack that manually persists the state of the map and
+ * re-inject it using MapboxMapOptions in onCreateView because of a bad handling of state restoration
+ * when used in backstack.
  *
  * @author Benoit LETONDOR
  */
@@ -22,15 +30,34 @@ public final class MapBoxFragment extends MapViewFragment
 {
     @Nullable
     private MapView mMapView;
+    @Nullable
+    private Bundle mSavedState;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        return new MapView(container.getContext());
+        // FIXME remove that trick when a suitable solution is found
+        MapboxMapOptions options = null;
+        if( mSavedState != null )
+        {
+            options = new MapboxMapOptions();
+            final CameraPosition cameraPosition = mSavedState.getParcelable(MapboxConstants.STATE_CAMERA_POSITION);
+            options.camera(cameraPosition);
+            mSavedState = null;
+        }
+
+        if( options == null )
+        {
+            return new MapView(container.getContext());
+        }
+        else
+        {
+            return new MapView(container.getContext(), options);
+        }
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+    public void onViewCreated(View view, @Nullable final Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
 
@@ -87,9 +114,12 @@ public final class MapBoxFragment extends MapViewFragment
     {
         if( mMapView != null )
         {
+            mSavedState = new Bundle();
+            mMapView.onSaveInstanceState(mSavedState);
             mMapView.onDestroy();
-            mMapView = null;
         }
+
+        mMapView = null;
 
         super.onDestroyView();
     }

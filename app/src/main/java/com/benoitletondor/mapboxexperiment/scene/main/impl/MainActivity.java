@@ -19,6 +19,7 @@ import com.benoitletondor.mapboxexperiment.common.OnBackPressedInterceptor;
 import com.benoitletondor.mapboxexperiment.common.mvp.presenter.loader.PresenterFactory;
 import com.benoitletondor.mapboxexperiment.common.mvp.view.impl.BaseActivity;
 import com.benoitletondor.mapboxexperiment.injection.AppComponent;
+import com.benoitletondor.mapboxexperiment.scene.history.impl.HistoryFragment;
 import com.benoitletondor.mapboxexperiment.scene.home.impl.HomeFragment;
 import com.benoitletondor.mapboxexperiment.scene.main.MainPresenter;
 import com.benoitletondor.mapboxexperiment.scene.main.MainView;
@@ -189,6 +190,18 @@ public final class MainActivity extends BaseActivity<MainPresenter, MainView> im
         }
     }
 
+    @Override
+    public void showHistoryView()
+    {
+        final Fragment activeFragment = getActiveFragment();
+        if( activeFragment != null && activeFragment instanceof HistoryFragment )
+        {
+            return;
+        }
+
+        setActiveFragment(new HistoryFragment(), true);
+    }
+
 // -------------------------------->
 
     @Override
@@ -205,6 +218,9 @@ public final class MainActivity extends BaseActivity<MainPresenter, MainView> im
         {
             case R.id.navigation_home:
                 mPresenter.onHomeButtonClicked();
+                break;
+            case R.id.navigation_history:
+                mPresenter.onHistoryButtonClicked();
                 break;
         }
 
@@ -231,6 +247,10 @@ public final class MainActivity extends BaseActivity<MainPresenter, MainView> im
         if( fragment instanceof HomeFragment )
         {
             mNavigationView.setCheckedItem(R.id.navigation_home);
+        }
+        else if( fragment instanceof HistoryFragment)
+        {
+            mNavigationView.setCheckedItem(R.id.navigation_history);
         }
     }
 

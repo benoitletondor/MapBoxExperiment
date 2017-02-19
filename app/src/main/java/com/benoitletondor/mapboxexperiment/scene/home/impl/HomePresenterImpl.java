@@ -133,7 +133,13 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
         super.onStop();
     }
 
-// ------------------------------------->
+    @Override
+    public void onPresenterDestroyed()
+    {
+        super.onPresenterDestroyed();
+    }
+
+    // ------------------------------------->
 
     @Override
     protected void onLocationNotAvailable(@NonNull ConnectionResult connectionResult)
