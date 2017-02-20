@@ -9,12 +9,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.graphics.drawable.VectorDrawableCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 
@@ -327,15 +328,47 @@ public final class HomeFragment extends BaseMapFragment<HomePresenter, HomeView>
     @Override
     public void setAddLocationFABValidateIcon()
     {
+        // To avoid making change if content is already as we want
+        final int targetColor = ContextCompat.getColor(getContext(), R.color.add_location_fab_validate_color);
+        if( mAddLocationFAB.getBackgroundTintList() != null && mAddLocationFAB.getBackgroundTintList().getDefaultColor() == targetColor )
+        {
+            return;
+        }
+
         mAddLocationFAB.setImageDrawable(VectorDrawableCompat.create(getResources(), R.drawable.ic_check_white_24dp, getContext().getTheme()));
-        mAddLocationFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getContext(), R.color.add_location_fab_validate_color)));
+        mAddLocationFAB.setBackgroundTintList(ColorStateList.valueOf(targetColor));
+
+        mAddLocationFAB.setScaleX(0);
+        mAddLocationFAB.setScaleY(0);
+        ViewCompat.animate(mAddLocationFAB)
+            .scaleX(1)
+            .scaleY(1)
+            .setDuration(200)
+            .setInterpolator(new OvershootInterpolator())
+            .start();
     }
 
     @Override
     public void setAddLocationFABAddLocationIcon()
     {
+        // To avoid making change if content is already as we want
+        final int targetColor = ContextCompat.getColor(getContext(), R.color.add_location_fab_default_color);
+        if( mAddLocationFAB.getBackgroundTintList() != null && mAddLocationFAB.getBackgroundTintList().getDefaultColor() == targetColor )
+        {
+            return;
+        }
+
         mAddLocationFAB.setImageDrawable(VectorDrawableCompat.create(getResources(), R.drawable.ic_add_location_white_24dp, getContext().getTheme()));
-        mAddLocationFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getContext(), R.color.add_location_fab_default_color)));
+        mAddLocationFAB.setBackgroundTintList(ColorStateList.valueOf(targetColor));
+
+        mAddLocationFAB.setScaleX(0);
+        mAddLocationFAB.setScaleY(0);
+        ViewCompat.animate(mAddLocationFAB)
+            .scaleX(1)
+            .scaleY(1)
+            .setDuration(250)
+            .setInterpolator(new OvershootInterpolator())
+            .start();
     }
 
     @Override

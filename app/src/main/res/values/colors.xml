@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#03A9F4</color>
 
     <color name="add_location_fab_default_color">@color/colorAccent</color>
     <color name="add_location_fab_validate_color">#4CAF50</color>

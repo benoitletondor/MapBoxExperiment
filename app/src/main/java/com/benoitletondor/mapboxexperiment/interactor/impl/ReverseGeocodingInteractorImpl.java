@@ -56,7 +56,7 @@ public final class ReverseGeocodingInteractorImpl extends BaseInteractorImpl imp
 
                 if( addresses.isEmpty() )
                 {
-                    throw new Exception("No addresses found");
+                    return new Address(Locale.getDefault());
                 }
 
                 return addresses.get(0);
