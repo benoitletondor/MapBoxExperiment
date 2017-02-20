@@ -8,4 +8,7 @@
     <color name="add_location_fab_validate_color">#4CAF50</color>
 
     <color name="not_selected_menu_item">#777</color>
+
+    <color name="cell_history_marker_name_text_color">#222</color>
+    <color name="cell_history_marker_position_text_color">#666</color>
 </resources>

@@ -14,6 +14,8 @@
     <string name="open_drawer">Open menu</string>
     <string name="close_drawer">Close menu</string>
 
+    <string name="cell_history_position">Lat: %1$f / Long: %2$f</string>
+
     <!-- Error dialogs -->
     <string name="no_location_error_title">Location unavailable</string>
     <string name="no_location_error_message">An error occurred trying to retrieve device location (%s)</string>
@@ -23,4 +25,6 @@
     <string name="map_loading_error_message">An error occurred while loading the map: %s</string>
     <string name="save_location_error_title">Unable to add location</string>
     <string name="save_location_error_message">An error occurred while saving the location, try again later</string>
+    <string name="error_loading_markers_title">Oops</string>
+    <string name="error_loading_markers_message">An error occurred while loading markers\n¯\_(ツ)_/¯</string>
 </resources>

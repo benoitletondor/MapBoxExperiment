@@ -39,6 +39,7 @@ dependencies {
     // Support
     compile 'com.android.support:appcompat-v7:25.1.1'
     compile 'com.android.support:design:25.1.1'
+    compile 'com.android.support:recyclerview-v7:25.1.1'
 
     // GPS (version is not the last on purpose to be able to test on simulators which don't have the last GPS version)
     compile 'com.google.android.gms:play-services-location:9.8.0'

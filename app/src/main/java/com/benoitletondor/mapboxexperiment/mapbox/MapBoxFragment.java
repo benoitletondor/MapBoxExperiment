@@ -43,7 +43,6 @@ public final class MapBoxFragment extends MapViewFragment
             options = new MapboxMapOptions();
             final CameraPosition cameraPosition = mSavedState.getParcelable(MapboxConstants.STATE_CAMERA_POSITION);
             options.camera(cameraPosition);
-            mSavedState = null;
         }
 
         if( options == null )
@@ -62,7 +61,7 @@ public final class MapBoxFragment extends MapViewFragment
         super.onViewCreated(view, savedInstanceState);
 
         mMapView = (MapView) view;
-        mMapView.onCreate(savedInstanceState);
+        mMapView.onCreate(savedInstanceState == null ? mSavedState : savedInstanceState);
     }
 
     @Override
@@ -93,6 +92,10 @@ public final class MapBoxFragment extends MapViewFragment
         if( mMapView != null )
         {
             mMapView.onSaveInstanceState(outState);
+        }
+        else if( mSavedState != null )
+        {
+            outState.putAll(mSavedState);
         }
 
         super.onSaveInstanceState(outState);

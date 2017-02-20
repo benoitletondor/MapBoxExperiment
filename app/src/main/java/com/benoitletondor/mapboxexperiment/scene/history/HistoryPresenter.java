@@ -9,5 +9,8 @@ import com.benoitletondor.mapboxexperiment.common.mvp.presenter.BasePresenter;
  */
 public interface HistoryPresenter extends BasePresenter<HistoryView>
 {
-
+    /**
+     * Called when the user press a marker on the list
+     */
+    void onMarkerClicked();
 }
