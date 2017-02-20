@@ -78,6 +78,11 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
      */
     @Nullable
     private Disposable mReverseGeocodingAction;
+    /**
+     * Temp variable that stores the marker to focus next time the view starts
+     */
+    @Nullable
+    private MapMarker mTempMarkerToFocus;
 
 // ------------------------------------->
 
@@ -139,7 +144,7 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
         super.onPresenterDestroyed();
     }
 
-    // ------------------------------------->
+// ------------------------------------->
 
     @Override
     protected void onLocationNotAvailable(@NonNull ConnectionResult connectionResult)
@@ -294,6 +299,12 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
         return false;
     }
 
+    @Override
+    public void onMarkerToFocus(@NonNull MapMarker marker)
+    {
+        mTempMarkerToFocus = marker;
+    }
+
     /**
      * Start reverse geocoding for the given location. Will cancel any previous reverse geocoding
      * action started.
@@ -378,12 +389,15 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
     }
 
     /**
-     * Load markers from storage and put them into {@link #mMarkers} list asynchronously
+     * Load markers from storage and put them into {@link #mMarkers} list asynchronously. This methods also
+     * handle focus on {@link #mTempMarkerToFocus}.
+     *
      * FIXME concurrency is not handled properly here: what happens if the map gets re-created while loading
      */
     private void loadMarkers()
     {
         addSubscription(mMarkerStorageInteractor.retrieveStoredMarkers()
+            .subscribeOn(Schedulers.computation())
             .map(new Function<List<MarkerStorageInteractor.StoredMarker>, List<MapMarker>>()
             {
                 @Override
@@ -403,8 +417,32 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
                     return mMarkers;
                 }
             })
+            .observeOn(AndroidSchedulers.mainThread())
+            .map(new Function<List<MapMarker>, List<MapMarker>>()
+            {
+                @Override
+                public List<MapMarker> apply(@io.reactivex.annotations.NonNull List<MapMarker> markers) throws Exception
+                {
+                    if( mTempMarkerToFocus != null && mMap != null )
+                    {
+                        for(MapMarker marker : markers)
+                        {
+                            // TODO this is lame, we need to find a better way to ensure the marker is the one we want
+                            if( marker.getLatitude() == mTempMarkerToFocus.getLatitude() &&
+                                marker.getLongitude() == mTempMarkerToFocus.getLongitude() )
+                            {
+                                mMap.moveCamera(marker.getLatitude(), marker.getLongitude(), 15f, false);
+                                mMap.selectMarker(marker);
+                            }
+                        }
+
+                        mTempMarkerToFocus = null;
+                    }
+
+                    return markers;
+                }
+            })
             .ignoreElements()
-            .subscribeOn(Schedulers.computation())
             .subscribe(new Action()
             {
                 @Override

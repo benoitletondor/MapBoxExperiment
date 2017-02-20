@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.v7.widget.RecyclerView;
 
+import com.benoitletondor.mapboxexperiment.common.map.MapMarker;
 import com.benoitletondor.mapboxexperiment.scene.history.impl.MarkersHistoryAdapter;
 
 /**
@@ -40,4 +41,11 @@ public interface HistoryView extends MarkersHistoryAdapter.MarkerClickedListener
      * Show an error to the user indicating an error occurred loading data
      */
     void showLoadingMarkersError();
+
+    /**
+     * Take the user back to the map view and focus on the given marker
+     *
+     * @param marker marker to display
+     */
+    void showMapAndFocusToMarker(@NonNull MapMarker marker);
 }

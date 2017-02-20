@@ -3,6 +3,7 @@ package com.benoitletondor.mapboxexperiment.scene.home;
 import android.support.annotation.NonNull;
 
 import com.benoitletondor.mapboxexperiment.common.map.AutoCompleteLocationItem;
+import com.benoitletondor.mapboxexperiment.common.map.MapMarker;
 import com.benoitletondor.mapboxexperiment.common.mvp.presenter.BaseMapPresenter;
 
 /**
@@ -30,4 +31,11 @@ public interface HomePresenter extends BaseMapPresenter<HomeView>
      * @return true to intercept it, false to let it go
      */
     boolean onBackPressed();
+
+    /**
+     * Called when the focus should be made on a marker
+     *
+     * @param marker marker to focus
+     */
+    void onMarkerToFocus(@NonNull MapMarker marker);
 }

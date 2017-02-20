@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.graphics.drawable.VectorDrawableCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import android.widget.ImageView;
 
 import com.benoitletondor.mapboxexperiment.R;
 import com.benoitletondor.mapboxexperiment.common.LocationAutoCompleteSearchBar;
+import com.benoitletondor.mapboxexperiment.common.map.MapMarker;
 import com.benoitletondor.mapboxexperiment.common.map.MapViewFragment;
 import com.benoitletondor.mapboxexperiment.common.mvp.presenter.loader.PresenterFactory;
 import com.benoitletondor.mapboxexperiment.common.mvp.view.impl.BaseMapFragment;
@@ -407,5 +409,13 @@ public final class HomeFragment extends BaseMapFragment<HomePresenter, HomeView>
             .setMessage(R.string.save_location_error_message)
             .setPositiveButton(android.R.string.ok, null)
             .show();
+    }
+
+    public void focusToMarker(@NonNull MapMarker marker)
+    {
+        if( mPresenter != null )
+        {
+            mPresenter.onMarkerToFocus(marker);
+        }
     }
 }

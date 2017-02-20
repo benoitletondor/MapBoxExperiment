@@ -124,9 +124,12 @@ public final class HistoryPresenterImpl extends BasePresenterImpl<HistoryView> i
     }
 
     @Override
-    public void onMarkerClicked()
+    public void onMarkerClicked(@NonNull MapMarker marker)
     {
-
+        if( mView != null )
+        {
+            mView.showMapAndFocusToMarker(marker);
+        }
     }
 
 // ---------------------------------->

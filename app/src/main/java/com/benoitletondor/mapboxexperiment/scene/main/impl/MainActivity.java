@@ -16,6 +16,7 @@ import android.view.MenuItem;
 
 import com.benoitletondor.mapboxexperiment.R;
 import com.benoitletondor.mapboxexperiment.common.OnBackPressedInterceptor;
+import com.benoitletondor.mapboxexperiment.common.map.MapMarker;
 import com.benoitletondor.mapboxexperiment.common.mvp.presenter.loader.PresenterFactory;
 import com.benoitletondor.mapboxexperiment.common.mvp.view.impl.BaseActivity;
 import com.benoitletondor.mapboxexperiment.injection.AppComponent;
@@ -35,6 +36,9 @@ import javax.inject.Inject;
  */
 public final class MainActivity extends BaseActivity<MainPresenter, MainView> implements MainView, NavigationView.OnNavigationItemSelectedListener, FragmentManager.OnBackStackChangedListener
 {
+    /**
+     * Id of the fragment container
+     */
     private final static int FRAGMENT_CONTAINER = R.id.activity_main_fragment_container;
 
     /**
@@ -42,6 +46,11 @@ public final class MainActivity extends BaseActivity<MainPresenter, MainView> im
      */
     @Inject
     PresenterFactory<MainPresenter> mPresenterFactory;
+    /**
+     * Temp variable to store the marker to display next time the home view comes back
+     */
+    @Nullable
+    private MapMarker mTempMarkerToDisplay;
 
     /**
      * Drawer layout from XML
@@ -202,6 +211,13 @@ public final class MainActivity extends BaseActivity<MainPresenter, MainView> im
         setActiveFragment(new HistoryFragment(), true);
     }
 
+    @Override
+    public void showHomeToMarker(@NonNull MapMarker marker)
+    {
+        mTempMarkerToDisplay = marker;
+        showHomeView();
+    }
+
 // -------------------------------->
 
     @Override
@@ -247,6 +263,12 @@ public final class MainActivity extends BaseActivity<MainPresenter, MainView> im
         if( fragment instanceof HomeFragment )
         {
             mNavigationView.setCheckedItem(R.id.navigation_home);
+
+            if( mTempMarkerToDisplay != null )
+            {
+                ((HomeFragment) fragment).focusToMarker(mTempMarkerToDisplay);
+                mTempMarkerToDisplay = null;
+            }
         }
         else if( fragment instanceof HistoryFragment)
         {

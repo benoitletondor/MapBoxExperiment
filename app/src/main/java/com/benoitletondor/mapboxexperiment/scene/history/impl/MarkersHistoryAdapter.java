@@ -14,7 +14,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Adapter for the HistoryView recycler view
  *
@@ -35,7 +34,7 @@ public final class MarkersHistoryAdapter extends RecyclerView.Adapter<MarkersHis
 
 // -------------------------------------->
 
-    public MarkersHistoryAdapter(@NonNull List<MapMarker> markers, @NonNull MarkerClickedListener listener)
+    MarkersHistoryAdapter(@NonNull List<MapMarker> markers, @NonNull MarkerClickedListener listener)
     {
         mListener = new WeakReference<>(listener);
         mMarkers = new ArrayList<>(markers);
@@ -69,14 +68,14 @@ public final class MarkersHistoryAdapter extends RecyclerView.Adapter<MarkersHis
 
 // -------------------------------------->
 
-    public static final class MarkerViewHolder extends RecyclerView.ViewHolder
+    static final class MarkerViewHolder extends RecyclerView.ViewHolder
     {
         @NonNull
         private final TextView mNameTextView;
         @NonNull
         private final TextView mPositionTextView;
 
-        public MarkerViewHolder(View itemView)
+        MarkerViewHolder(View itemView)
         {
             super(itemView);
 
@@ -84,7 +83,7 @@ public final class MarkersHistoryAdapter extends RecyclerView.Adapter<MarkersHis
             mPositionTextView = (TextView) itemView.findViewById(R.id.cell_history_position);
         }
 
-        public void bind(@NonNull final MapMarker marker, @NonNull final WeakReference<MarkerClickedListener> listener)
+        void bind(@NonNull final MapMarker marker, @NonNull final WeakReference<MarkerClickedListener> listener)
         {
             itemView.setOnClickListener(new View.OnClickListener()
             {

@@ -72,4 +72,11 @@ public interface MapApi
      * @param listener the map camera move listener
      */
     void setOnCameraMoveListener(@Nullable OnCameraMoveListener listener);
+
+    /**
+     * Select the given marker
+     *
+     * @param marker the marker to select
+     */
+    void selectMarker(@NonNull MapMarker marker);
 }

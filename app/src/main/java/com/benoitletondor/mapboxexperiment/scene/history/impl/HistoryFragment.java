@@ -169,11 +169,20 @@ public final class HistoryFragment extends BaseFragment<HistoryPresenter, Histor
     }
 
     @Override
+    public void showMapAndFocusToMarker(@NonNull MapMarker marker)
+    {
+        if( mMainView != null )
+        {
+            mMainView.showHomeToMarker(marker);
+        }
+    }
+
+    @Override
     public void onMarkerClicked(@NonNull MapMarker marker)
     {
         if( mPresenter != null )
         {
-            mPresenter.onMarkerClicked();
+            mPresenter.onMarkerClicked(marker);
         }
     }
 }

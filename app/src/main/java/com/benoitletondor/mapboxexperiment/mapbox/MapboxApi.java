@@ -173,6 +173,17 @@ final class MapboxApi implements MapApi, MapLocationSource.OnLocationChangedList
     }
 
     @Override
+    public void selectMarker(@NonNull MapMarker marker)
+    {
+        if( !(marker instanceof MapboxMarker) )
+        {
+            throw new IllegalStateException("Cannot call remove marker without a mapbox marker");
+        }
+
+        mMapboxMap.selectMarker(((MapboxMarker) marker).mMarker);
+    }
+
+    @Override
     public void onLocationChanged(@NonNull Location newLocation)
     {
         final LatLng position = new LatLng(newLocation.getLatitude(), newLocation.getLongitude());
