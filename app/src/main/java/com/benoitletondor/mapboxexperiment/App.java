@@ -1,7 +1,7 @@
 package com.benoitletondor.mapboxexperiment;
 
-import android.app.Application;
 import android.support.annotation.NonNull;
+import android.support.multidex.MultiDexApplication;
 
 import com.benoitletondor.mapboxexperiment.injection.AppComponent;
 import com.benoitletondor.mapboxexperiment.injection.AppModule;
@@ -14,7 +14,7 @@ import com.squareup.leakcanary.LeakCanary;
  *
  * @author Benoit LETONDOR
  */
-public final class App extends Application
+public final class App extends MultiDexApplication
 {
     /**
      * The app dagger component
