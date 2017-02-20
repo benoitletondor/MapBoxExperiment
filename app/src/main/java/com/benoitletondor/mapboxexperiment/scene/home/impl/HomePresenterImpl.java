@@ -4,6 +4,7 @@ import android.location.Address;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 import com.benoitletondor.mapboxexperiment.common.LimitedSizeList;
@@ -36,7 +37,8 @@ import io.reactivex.schedulers.Schedulers;
  *
  * @author Benoit LETONDOR
  */
-public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> implements HomePresenter, OnMapClickListener, OnCameraMoveListener
+@VisibleForTesting // Not final for testing
+public class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> implements HomePresenter, OnMapClickListener, OnCameraMoveListener
 {
     private static final String TAG = "HomePresenter";
 
@@ -54,11 +56,13 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
      * The currently displayed map (will be null until loaded and nullified on each view stop to avoid leaks)
      */
     @Nullable
-    private MapApi mMap;
+    @VisibleForTesting
+    MapApi mMap;
     /**
      * The timestamp of the last view start
      */
-    private long mLastStartTimestamp;
+    @VisibleForTesting
+    long mLastStartTimestamp;
     /**
      * Has the map been zoomed on user position yet
      */
@@ -67,12 +71,14 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
      * The state of user adding a location using the FAB
      */
     @NonNull
-    private AddLocationState mAddLocationState = AddLocationState.NORMAL;
+    @VisibleForTesting
+    AddLocationState mAddLocationState = AddLocationState.NORMAL;
     /**
      * List that stores the shown markers
      */
     @NonNull
-    private LimitedSizeList<MapMarker> mMarkers = new LimitedSizeList<>(15);
+    @VisibleForTesting
+    LimitedSizeList<MapMarker> mMarkers = new LimitedSizeList<>(15);
     /**
      * Background action that perform reverse geocoding on a location, will be null if nothing happens at the moment
      */
@@ -82,7 +88,8 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
      * Temp variable that stores the marker to focus next time the view starts
      */
     @Nullable
-    private MapMarker mTempMarkerToFocus;
+    @VisibleForTesting
+    MapMarker mTempMarkerToFocus;
 
 // ------------------------------------->
 
@@ -142,6 +149,13 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
     public void onPresenterDestroyed()
     {
         super.onPresenterDestroyed();
+    }
+
+    @VisibleForTesting
+    @Override
+    protected void initPlayServices()
+    {
+        super.initPlayServices();
     }
 
 // ------------------------------------->
@@ -311,7 +325,8 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
      *
      * @param cameraCenterLocation the camera location
      */
-    private void reverseGeocodingForLocation(@NonNull CameraCenterLocation cameraCenterLocation)
+    @VisibleForTesting
+    void reverseGeocodingForLocation(@NonNull CameraCenterLocation cameraCenterLocation)
     {
         if( mView == null )
         {
@@ -357,7 +372,8 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
     /**
      * Update the view for the normal state. Will do nothing is view is null
      */
-    private void setViewStateNormal()
+    @VisibleForTesting
+    void setViewStateNormal()
     {
         if( mView != null )
         {
@@ -374,7 +390,8 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
     /**
      * Update the view for the adding location state. Will do nothing is view is null
      */
-    private void setViewStateAddingLocation()
+    @VisibleForTesting
+    void setViewStateAddingLocation()
     {
         if( mView != null )
         {
@@ -532,7 +549,8 @@ public final class HomePresenterImpl extends BaseMapPresenterImpl<HomeView> impl
 
 // ------------------------------------->
 
-    private enum AddLocationState
+    @VisibleForTesting
+    enum AddLocationState
     {
         /**
          * Normal state, user is not adding a location

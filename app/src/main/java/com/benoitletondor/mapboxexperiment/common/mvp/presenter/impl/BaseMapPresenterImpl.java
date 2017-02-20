@@ -4,6 +4,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 import com.benoitletondor.mapboxexperiment.common.map.MapApi;
@@ -38,7 +39,8 @@ public abstract class BaseMapPresenterImpl<V extends BaseMapView> extends BasePr
      * Play services client
      */
     @Nullable
-    private GoogleApiClient mGoogleApiClient;
+    @VisibleForTesting
+    protected GoogleApiClient mGoogleApiClient;
     /**
      * Current presenter state
      */
@@ -173,7 +175,8 @@ public abstract class BaseMapPresenterImpl<V extends BaseMapView> extends BasePr
     /**
      * Init play services if needed and start the map
      */
-    private void initPlayServices()
+    @VisibleForTesting
+    protected void initPlayServices()
     {
         assert mView != null;
 

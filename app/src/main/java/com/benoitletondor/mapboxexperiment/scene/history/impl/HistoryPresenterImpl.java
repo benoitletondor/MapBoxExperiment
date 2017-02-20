@@ -2,6 +2,7 @@ package com.benoitletondor.mapboxexperiment.scene.history.impl;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import com.benoitletondor.mapboxexperiment.common.map.MapMarker;
 import com.benoitletondor.mapboxexperiment.common.mvp.presenter.impl.BasePresenterImpl;
@@ -21,7 +22,8 @@ import io.reactivex.schedulers.Schedulers;
  *
  * @author Benoit LETONDOR
  */
-public final class HistoryPresenterImpl extends BasePresenterImpl<HistoryView> implements HistoryPresenter
+@VisibleForTesting // Not final for testing
+public class HistoryPresenterImpl extends BasePresenterImpl<HistoryView> implements HistoryPresenter
 {
     /**
      * The marker storage interactor, ready to be used
@@ -32,12 +34,14 @@ public final class HistoryPresenterImpl extends BasePresenterImpl<HistoryView> i
      * Current state
      */
     @NonNull
-    private State mState = State.CREATED;
+    @VisibleForTesting
+    State mState = State.CREATED;
     /**
      * Load data, will be null until {@link #mState} is {@link State#LOAD}
      */
     @Nullable
-    private List<MapMarker> mMarkers;
+    @VisibleForTesting
+    List<MapMarker> mMarkers;
 
 // ---------------------------------->
 
@@ -73,7 +77,11 @@ public final class HistoryPresenterImpl extends BasePresenterImpl<HistoryView> i
         }
     }
 
-    private void loadMarkers()
+    /**
+     * Start the async loading of markers from the interactor. Update the state and view accordingly
+     */
+    @VisibleForTesting
+    void loadMarkers()
     {
         mState = State.LOADING;
 
@@ -134,7 +142,8 @@ public final class HistoryPresenterImpl extends BasePresenterImpl<HistoryView> i
 
 // ---------------------------------->
 
-    private enum State
+    @VisibleForTesting
+    enum State
     {
         CREATED,
 

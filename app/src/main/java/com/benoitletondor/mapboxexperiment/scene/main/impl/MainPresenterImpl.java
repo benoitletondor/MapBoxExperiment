@@ -1,5 +1,7 @@
 package com.benoitletondor.mapboxexperiment.scene.main.impl;
 
+import android.support.annotation.VisibleForTesting;
+
 import com.benoitletondor.mapboxexperiment.common.mvp.presenter.impl.BasePresenterImpl;
 import com.benoitletondor.mapboxexperiment.scene.main.MainPresenter;
 import com.benoitletondor.mapboxexperiment.scene.main.MainView;
@@ -9,7 +11,8 @@ import com.benoitletondor.mapboxexperiment.scene.main.MainView;
  *
  * @author Benoit LETONDOR
  */
-public final class MainPresenterImpl extends BasePresenterImpl<MainView> implements MainPresenter
+@VisibleForTesting // Not final for testing
+public class MainPresenterImpl extends BasePresenterImpl<MainView> implements MainPresenter
 {
     @Override
     public void onHomeButtonClicked()

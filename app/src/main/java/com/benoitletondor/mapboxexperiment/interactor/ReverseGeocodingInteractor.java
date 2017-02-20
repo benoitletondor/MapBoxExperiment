@@ -14,6 +14,13 @@ import io.reactivex.Observable;
  */
 public interface ReverseGeocodingInteractor extends BaseInteractor
 {
+    /**
+     * Reverse the given coordinates into an address
+     *
+     * @param latitude latitude
+     * @param longitude longitude
+     * @return the matching address
+     */
     @NonNull
     Observable<Address> reverseGeocode(double latitude, double longitude);
 }
