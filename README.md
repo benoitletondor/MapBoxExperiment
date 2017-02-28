@@ -13,6 +13,12 @@ The app does the following:
 - Saves the last 15 added pins
 - Provides with an history screen that displays all added pins
 
+<p align="center">
+  <img src="https://github.com/benoitletondor/MapBoxExperiment/raw/develop/screenshot1.jpg" width="250"/>
+  <img src="https://github.com/benoitletondor/MapBoxExperiment/raw/develop/screenshot2.jpg" width="250"/>
+  <img src="https://github.com/benoitletondor/MapBoxExperiment/raw/develop/screenshot3.jpg" width="250"/>
+</p>
+
 
 ### Technical details
 
